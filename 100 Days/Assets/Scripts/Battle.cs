@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class Battle : MonoBehaviour {
 
@@ -8,12 +8,16 @@ public class Battle : MonoBehaviour {
     public bool day;
     public bool paused;
     public bool playerParticipate;
+    public bool battleStarted;
+    public List<UnitClass> playerUnits; // A list of playerUnits grabbed from unitManager
+    public List<UnitClass> enemyUnits; // A list of enemyUntis grabbed from enemyManager
     private bool playerWon;
     private bool enemyWon;
 
 	// Use this for initialization
 	void Start ()
     {
+        battleStarted = true;
         playerWon = false;
         enemyWon = false;
         paused = false;
@@ -32,6 +36,17 @@ public class Battle : MonoBehaviour {
             tickDown();
         }
 	}
+
+    // Check the unitManager for battling units
+    void getBattleUnits()
+    {
+        List<UnitClass> allPlayerUnits = unitManager.getPlayerUnits();
+
+        foreach(UnitClass unit in allPlayerUnits)
+        {
+
+        }
+    }
 
     // Check if any player units are at tick 0
     void checkPlayerUnits()
