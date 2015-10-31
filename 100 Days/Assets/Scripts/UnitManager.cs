@@ -17,9 +17,16 @@ public class UnitManager : MonoBehaviour {
 	    
 	}
 
-    // Returns the list with all the units
-    public List<UnitClass> getPlayerUnits()
+    // Returns the list of the squad with matching squad number
+    public List<UnitClass> getPlayerUnits(int squadNum)
     {
-        return allPlayerUnits;
+        List<UnitClass> unitsInSquad = new List<UnitClass>(4);
+
+        foreach(UnitClass unit in allPlayerUnits)
+        {
+            if (unit.squad == squadNum)
+                unitsInSquad.Add(unit);
+        }
+        return unitsInSquad;
     }
 }

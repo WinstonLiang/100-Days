@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class Battle : MonoBehaviour {
@@ -9,10 +10,12 @@ public class Battle : MonoBehaviour {
     public bool paused;
     public bool playerParticipate;
     public bool battleStarted;
+    public float tickTime; // Length of each tick time
     public List<UnitClass> playerUnits; // A list of playerUnits grabbed from unitManager
     public List<UnitClass> enemyUnits; // A list of enemyUntis grabbed from enemyManager
     private bool playerWon;
     private bool enemyWon;
+    private float time;
 
 	// Use this for initialization
 	void Start ()
@@ -22,42 +25,66 @@ public class Battle : MonoBehaviour {
         enemyWon = false;
         paused = false;
         playerParticipate = true; // Set to true for testing
-	}
+        unitManager = GetComponent<UnitManager>();
+        gameManager = GetComponent<GameManegers>();
+        playerUnits = unitManager.getPlayerUnits(1);
+    }
 	
 	// Update is called once per frame
 	void Update ()
     {
+        
 	    if(!playerWon && !enemyWon)
         {
             checkPlayerUnits();
             checkEnemyUnits();
 
             checkDeadUnits();
-            tickDown();
+            tickDown();            
         }
+        
 	}
 
-    // Check the unitManager for battling units
-    void getBattleUnits()
+    // Check if any player units attack/ability are at tick 0
+    void checkPlayerUnits()
     {
-        List<UnitClass> allPlayerUnits = unitManager.getPlayerUnits();
-
-        foreach(UnitClass unit in allPlayerUnits)
+        foreach(UnitClass unit in playerUnits)
         {
+            // Check the attack tick
+            if(unit.currentSpeed == 0)
+            {
+                // Do attacking here **********************************
+                unit.currentSpeed = unit.maxSpeed;
+            }
 
+            // Check the ability tick
+            if(unit.currentPower == 0)
+            {
+                // Do ability attack here **********************************
+                unit.currentPower = unit.maxPower;
+            }
         }
     }
 
-    // Check if any player units are at tick 0
-    void checkPlayerUnits()
-    {
-
-    }
-
-    // Check if any enemy units are at tick 0
+    // Check if any enemy units attack/ability are at tick 0
     void checkEnemyUnits()
     {
+        foreach (UnitClass unit in enemyUnits)
+        {
+            // Check the attack tick
+            if (unit.currentSpeed == 0)
+            {
+                // Do attacking here **********************************
+                unit.currentSpeed = unit.maxSpeed;
+            }
 
+            // Check the ability tick
+            if (unit.currentPower == 0)
+            {
+                // Do ability attack here **********************************
+                unit.currentPower = unit.maxPower;
+            }
+        }
     }
 
     // Check if all player units or all enemy units are dead
@@ -70,7 +97,12 @@ public class Battle : MonoBehaviour {
     // Check if every player unit is dead
     bool playersUnitsDead()
     {
-        return false;
+        foreach(UnitClass unit in playerUnits)
+        {
+            if (!unit.deadFlag)
+                return false;
+        }
+        return true;
     }
 
     // Check if every enemy unit is dead
@@ -82,8 +114,31 @@ public class Battle : MonoBehaviour {
     // Decrement the tick for every unit
     void tickDown()
     {
-        // Decrement the tick for attacks
+        if(time < tickTime)
+        {
+            time += 0.1f;
+        }
+        else
+        {
+            time = 0.0f;
+            foreach (UnitClass unitP in playerUnits)
+            {
+                // Decrement the tick for attacks
+                unitP.currentSpeed -= 1;
 
-        // Decrement the tick for abilities
+                // Decrement the tick for abilities
+                unitP.currentPower -= 1;
+            }
+
+            foreach (UnitClass unitE in enemyUnits)
+            {
+                // Decrement the tick for attacks
+                unitE.currentSpeed -= 1;
+
+                // Decrement the tick for abilities
+                unitE.currentPower -= 1;
+            }
+        }
+        Debug.Log("Tick time: " + time);
     }
 }
