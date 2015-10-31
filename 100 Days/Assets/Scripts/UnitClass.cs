@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UnitClass : MonoBehaviour 
 {
+    public List<int> stats;
 
     public string firstName;
     public string lastName;
@@ -20,6 +22,7 @@ public class UnitClass : MonoBehaviour
     public int substat = 0;
     public bool deadFlag = false;
     public int classType = 0;
+    public int squad = 0;
 
 
 
