@@ -6,6 +6,8 @@ public class UnitClass : MonoBehaviour
 {
     public List<int> stats;
 
+    public NameSelector name;
+
     public string firstName;
     public string lastName;
     public int level = 1;
@@ -24,12 +26,23 @@ public class UnitClass : MonoBehaviour
     public int classType = 0;
     public int squad = 0;
 
+    private int gender = Random.Range(0, 2);
 
 
 	// Use this for initialization
 	void Start () 
     {
-
+        if (gender == 0)
+        {
+            name.gender = "guy";
+        }
+        else
+        {
+            name.gender = "girl";
+        }
+        name.getName();
+        firstName = name.firstName;
+        lastName = name.lastName;
 	}
 	
 	// Update is called once per frame
@@ -40,6 +53,10 @@ public class UnitClass : MonoBehaviour
     }
 	void Update () 
     {
-	   
+        if (currentHealth < 0)
+        {
+            deadFlag = true;
+        }
+
 	}
 }
