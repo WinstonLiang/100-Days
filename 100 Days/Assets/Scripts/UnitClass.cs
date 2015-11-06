@@ -6,7 +6,8 @@ public class UnitClass : MonoBehaviour
 {
     public List<int> stats;
 
-    public NameSelector name;
+    public GameObject characterName;
+    public GameObject character;
 
     public string firstName;
     public string lastName;
@@ -26,12 +27,15 @@ public class UnitClass : MonoBehaviour
     public int classType = 0;
     public int squad = 0;
 
+    private NameSelector name;
     private int gender = Random.Range(0, 2);
-
 
 	// Use this for initialization
 	void Start () 
     {
+        characterName = GameObject.Find("Name");
+        name = characterName.GetComponent<NameSelector>();
+        character = GameObject.Find("Player");
         if (gender == 0)
         {
             name.gender = "guy";
@@ -51,12 +55,29 @@ public class UnitClass : MonoBehaviour
     {
         orginalStat = orginalStat - statChange;
     }
-	void Update () 
+
+    void classChange(int otherClass)
+    {
+        if (otherClass == 0)
+        {
+            AssaultClass type = character.GetComponent<AssaultClass>();
+        }
+        else if (otherClass == 1)
+        {
+            DefenderClass type = character.GetComponent<DefenderClass>();
+        }
+        else if (otherClass == 2)
+        {
+            MedicClass type = character.GetComponent<MedicClass>();
+        }
+    }
+
+    void Update()
     {
         if (currentHealth < 0)
         {
             deadFlag = true;
         }
-
-	}
+        classChange(1); //Test
+    }
 }
