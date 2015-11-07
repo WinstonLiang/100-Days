@@ -6,8 +6,8 @@ public class UnitClass : MonoBehaviour
 {
     public List<int> stats;
 
-    public GameObject characterName;
-    public GameObject character;
+    public GameObject unitName; //Get the unit name
+    public GameObject unit; //The type of unit
 
     public string firstName;
     public string lastName;
@@ -33,10 +33,10 @@ public class UnitClass : MonoBehaviour
 	// Use this for initialization
 	void Start () 
     {
-        characterName = GameObject.Find("Name");
-        name = characterName.GetComponent<NameSelector>();
-        character = GameObject.Find("Player");
-        if (gender == 0)
+        unitName = GameObject.Find("Name");
+        name = unitName.GetComponent<NameSelector>();
+        unit = GameObject.Find("Player");
+        if (gender == 0) // Determine gender of unit
         {
             name.gender = "guy";
         }
@@ -44,31 +44,33 @@ public class UnitClass : MonoBehaviour
         {
             name.gender = "girl";
         }
-        name.getName();
+        name.getName(); // Determine name of unit
         firstName = name.firstName;
         lastName = name.lastName;
 	}
 	
 	// Update is called once per frame
 
-    void changeStat(int statChange, ref int orginalStat)
+    // Change the stats of the unit
+    void changeStat(int statChange, int orginalStat)
     {
         orginalStat = orginalStat - statChange;
     }
 
+    // Change the class of the unit
     void classChange(int otherClass)
     {
         if (otherClass == 0)
         {
-            AssaultClass type = character.GetComponent<AssaultClass>();
+            AssaultClass type = unit.GetComponent<AssaultClass>();
         }
         else if (otherClass == 1)
         {
-            DefenderClass type = character.GetComponent<DefenderClass>();
+            DefenderClass type = unit.GetComponent<DefenderClass>();
         }
         else if (otherClass == 2)
         {
-            MedicClass type = character.GetComponent<MedicClass>();
+            MedicClass type = unit.GetComponent<MedicClass>();
         }
     }
 
