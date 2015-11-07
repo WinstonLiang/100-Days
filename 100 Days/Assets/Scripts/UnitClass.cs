@@ -35,7 +35,7 @@ public class UnitClass : MonoBehaviour
     {
         unitName = GameObject.Find("Name");
         name = unitName.GetComponent<NameSelector>();
-        unit = GameObject.Find("Player");
+        unit = GameObject.Find("Classes");
         if (gender == 0) // Determine gender of unit
         {
             name.gender = "guy";
@@ -60,15 +60,15 @@ public class UnitClass : MonoBehaviour
     // Change the class of the unit
     void classChange(int otherClass)
     {
-        if (otherClass == 0)
+        if (otherClass == 1)
         {
             AssaultClass type = unit.GetComponent<AssaultClass>();
         }
-        else if (otherClass == 1)
+        else if (otherClass == 2)
         {
             DefenderClass type = unit.GetComponent<DefenderClass>();
         }
-        else if (otherClass == 2)
+        else if (otherClass == 3)
         {
             MedicClass type = unit.GetComponent<MedicClass>();
         }
@@ -80,6 +80,6 @@ public class UnitClass : MonoBehaviour
         {
             deadFlag = true;
         }
-        classChange(1); //Test
+        //classChange(1); //Test
     }
 }
