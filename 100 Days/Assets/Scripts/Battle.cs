@@ -5,17 +5,21 @@ using System.Collections.Generic;
 public class Battle : MonoBehaviour {
 
     public UnitManager unitManager; // Retrieve squad information
-    public GameManegers gameManager; // Retrieve day information
+    public GameManagers gameManager; // Retrieve day information
+    public Transform playerSlots; // To access the Player Units children
     public bool day;
     public bool paused;
     public bool playerParticipate;
     public bool battleStarted;
     public float tickTime; // Length of each tick time
     public List<UnitClass> playerUnits; // A list of playerUnits grabbed from unitManager
+    public GameObject P1, P2, P3, P4; // Temporarily set to public for testing
     public List<UnitClass> enemyUnits; // A list of enemyUntis grabbed from enemyManager
     private bool playerWon;
-    private bool enemyWon;
+    private bool enemyWon;    
+    private int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted
     private float time;
+    //Add battle timer;
 
 	// Use this for initialization
 	void Start ()
@@ -23,11 +27,12 @@ public class Battle : MonoBehaviour {
         battleStarted = true;
         playerWon = false;
         enemyWon = false;
-        paused = false;
+        paused = false;       
         playerParticipate = true; // Set to true for testing
         unitManager = GetComponent<UnitManager>();
-        gameManager = GetComponent<GameManegers>();
+        gameManager = GetComponent<GameManagers>();
         playerUnits = unitManager.getPlayerUnits(1);
+        setPlayerSlots();
     }
 	
 	// Update is called once per frame
@@ -44,6 +49,15 @@ public class Battle : MonoBehaviour {
         }
         
 	}
+
+    // Set the reference of the Player GameObjects 
+    void setPlayerSlots()
+    {
+        P1 = GameObject.Find("P1");
+        P2 = GameObject.Find("P2");
+        P3 = GameObject.Find("P3");
+        P4 = GameObject.Find("P4");
+    }
 
     // Check if any player units attack/ability are at tick 0
     void checkPlayerUnits()

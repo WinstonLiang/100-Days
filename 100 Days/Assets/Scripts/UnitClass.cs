@@ -80,6 +80,5 @@ public class UnitClass : MonoBehaviour
         {
             deadFlag = true;
         }
-        classChange(1); //Test
     }
 }

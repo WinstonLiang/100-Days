@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class GameManegers : MonoBehaviour {
+public class GameManagers : MonoBehaviour {
 
     public int days;
     public int Hour;
