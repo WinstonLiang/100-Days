@@ -6,7 +6,7 @@ public class Battle : MonoBehaviour {
 
     public UnitManager unitManager; // Retrieve squad information
     public GameManagers gameManager; // Retrieve day information
-    public Transform playerSlots; // To access the Player Units children
+    //public Transform playerSlots; // To access the Player Units children
     public bool day;
     public bool paused;
     public bool playerParticipate;
@@ -14,40 +14,46 @@ public class Battle : MonoBehaviour {
     public float tickTime; // Length of each tick time
     public List<UnitClass> playerUnits; // A list of playerUnits grabbed from unitManager
     public GameObject P1, P2, P3, P4; // Temporarily set to public for testing
-    public List<UnitClass> enemyUnits; // A list of enemyUntis grabbed from enemyManager
+    public List<UnitClass> enemyUnits; // A list of enemyUnits grabbed from enemyManager
+    public GameObject E1, E2, E3, E4; // Temporarily set to public for testing 
+    public float time;
     private bool playerWon;
     private bool enemyWon;    
     private int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted
-    private float time;
     //Add battle timer;
 
 	// Use this for initialization
 	void Start ()
     {
+        Invoke("InitializeBattle", 2);
+    }
+
+    void InitializeBattle()
+    {
         battleStarted = true;
         playerWon = false;
         enemyWon = false;
-        paused = false;       
+        paused = false;
         playerParticipate = true; // Set to true for testing
         unitManager = GetComponent<UnitManager>();
         gameManager = GetComponent<GameManagers>();
-        playerUnits = unitManager.getPlayerUnits(1);
+        playerUnits = unitManager.getBattlingSquad();
+        enemyUnits = unitManager.getBattlingSquad();
         setPlayerSlots();
+        setEnemySlots();
     }
 	
 	// Update is called once per frame
 	void Update ()
     {
-        
+
 	    if(!playerWon && !enemyWon)
         {
             checkPlayerUnits();
             checkEnemyUnits();
-
             checkDeadUnits();
-            tickDown();            
-        }
-        
+            tickDown();
+        }       
 	}
 
     // Set the reference of the Player GameObjects 
@@ -59,15 +65,26 @@ public class Battle : MonoBehaviour {
         P4 = GameObject.Find("P4");
     }
 
+    // Set the reference of the Enemy GameObjects 
+    void setEnemySlots()
+    {
+        E1 = GameObject.Find("E1");
+        E2 = GameObject.Find("E2");
+        E3 = GameObject.Find("E3");
+        E4 = GameObject.Find("E4");
+    }
+
     // Check if any player units attack/ability are at tick 0
     void checkPlayerUnits()
     {
+        
         foreach(UnitClass unit in playerUnits)
-        {
+        {            
             // Check the attack tick
-            if(unit.currentSpeed == 0)
-            {
+            if (unit.currentSpeed == 0)
+            {                
                 // Do attacking here **********************************
+                print(unit.firstName + "attacks!");
                 unit.currentSpeed = unit.maxSpeed;
             }
 
@@ -75,6 +92,7 @@ public class Battle : MonoBehaviour {
             if(unit.currentPower == 0)
             {
                 // Do ability attack here **********************************
+                print(unit.firstName + "uses ability!");
                 unit.currentPower = unit.maxPower;
             }
         }
@@ -115,8 +133,8 @@ public class Battle : MonoBehaviour {
         {
             if (!unit.deadFlag)
                 return false;
-        }
-        return true;
+        }        
+        return false; // set to true
     }
 
     // Check if every enemy unit is dead
@@ -139,7 +157,7 @@ public class Battle : MonoBehaviour {
             {
                 // Decrement the tick for attacks
                 unitP.currentSpeed -= 1;
-
+                                
                 // Decrement the tick for abilities
                 unitP.currentPower -= 1;
             }
@@ -152,7 +170,6 @@ public class Battle : MonoBehaviour {
                 // Decrement the tick for abilities
                 unitE.currentPower -= 1;
             }
-        }
-        Debug.Log("Tick time: " + time);
+        }        
     }
 }

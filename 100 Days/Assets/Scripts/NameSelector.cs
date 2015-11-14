@@ -3,30 +3,23 @@ using System.Collections;
 
 public class NameSelector : MonoBehaviour {
 
-    public string gender;
-    string[] guys= {"Alex","Christopher","David","Leon","William","Winston","Aaron","Alan","James","Daivs","Arnold","Victor","Chirs","Jake","George","Mark","Michael","Rodney","Jack"};
-    string[] girls = { "Tiffany", "Beth", "Alice", "Rhonda", "Tina", "Sarah","Chirstine","Kathy","Summer","Mary","Dawn","Wendy","Piper","Hillary"};
+    public int gender = Random.Range(0, 2);
+    string[] first = {"Alex","Christopher","David","Leon","William","Winston","Aaron","Alan","James","Daivs","Arnold","Victor","Chirs","Jake","George","Mark","Michael","Rodney","Jack",
+                      "Tiffany", "Beth", "Alice", "Rhonda", "Tina", "Sarah","Chirstine","Kathy","Summer","Mary","Dawn","Wendy","Piper","Hillary"};
     string[] last = { "Chapp", "Walker", "Nguyen", "Perez","Liang","Loera","Birch","Gibson" ,"Wong","Walker"};
     string[] codeName = { "Bob The Builder", "Super Spaceman", "Lone Wanderer" };
     public string firstName;
     public string lastName;
-    public string name;
+    public string names;
 	// Use this for initialization
 	void Start () {
 
 	}
     public void getName ()
     {
-        if (gender == "guy")
-        {
-            firstName = guys[Random.Range(0, guys.Length)];
-        }
-        if (gender == "girl")
-        {
-            firstName = girls[Random.Range(0, girls.Length)];
-        }
+        firstName = first[Random.Range(0, first.Length)];    
         lastName = last[Random.Range(0, last.Length)];
-        name = codeName[Random.Range(0, codeName.Length)];
+        names = codeName[Random.Range(0, codeName.Length)];
     }
 	
 }
