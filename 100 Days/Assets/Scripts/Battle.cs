@@ -17,8 +17,10 @@ public class Battle : MonoBehaviour {
     public List<UnitClass> enemyUnits; // A list of enemyUnits grabbed from enemyManager
     public GameObject E1, E2, E3, E4; // Temporarily set to public for testing 
     public float time;
+    public int battleLength;
     private bool playerWon;
-    private bool enemyWon;    
+    private bool enemyWon;
+    private bool battleEnd;
     private int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted
     //Add battle timer;
 
@@ -53,6 +55,7 @@ public class Battle : MonoBehaviour {
             checkEnemyUnits();
             checkDeadUnits();
             tickDown();
+            checkBattleEnd();
         }       
 	}
 
@@ -153,6 +156,7 @@ public class Battle : MonoBehaviour {
         else
         {
             time = 0.0f;
+            battleLength--;
             foreach (UnitClass unitP in playerUnits)
             {
                 // Decrement the tick for attacks
@@ -171,5 +175,13 @@ public class Battle : MonoBehaviour {
                 unitE.currentPower -= 1;
             }
         }        
+    }
+
+    void checkBattleEnd()
+    {
+         if (battleLength <= 0)
+         {
+              battleEnd = true;
+         }
     }
 }
