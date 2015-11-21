@@ -17,6 +17,11 @@ public class MedicClass : MonoBehaviour {
         unit.maxPower = 40;
 	}
 	
+    public void ablilityHeal(UnitClass unit)
+    {
+        
+        unit.currentHealth +=
+    }
 	// Update is called once per frame
 	void Update () {
 	
