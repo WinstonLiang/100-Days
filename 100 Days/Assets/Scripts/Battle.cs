@@ -10,7 +10,7 @@ public class Battle : MonoBehaviour {
     public bool day;
     public bool paused;
     public bool playerParticipate;
-    public bool battleStarted;
+    public bool currentlyBattling;
     public float tickTime; // Length of each tick time
     public List<UnitClass> playerUnits; // A list of playerUnits grabbed from unitManager
     public GameObject P1, P2, P3, P4; // Temporarily set to public for testing
@@ -19,44 +19,41 @@ public class Battle : MonoBehaviour {
     public float time;
     public int battleLength;
     private bool playerWon;
-    private bool enemyWon;
-    private bool battleEnd;
-    private int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted
-    //Add battle timer;
+    private bool enemyWon;    
+    private int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted    
 
 	// Use this for initialization
 	void Start ()
     {
-        Invoke("InitializeBattle", 2);
-    }
-
-    void InitializeBattle()
-    {
-        battleStarted = true;
+        // Using delayed invoke is not necessary, can change script execution order in Unity/Project Settings
+        currentlyBattling = true;
         playerWon = false;
-        enemyWon = false;
+        enemyWon = false;        
         paused = false;
         playerParticipate = true; // Set to true for testing
         unitManager = GetComponent<UnitManager>();
         gameManager = GetComponent<GameManagers>();
         playerUnits = unitManager.getBattlingSquad();
-        enemyUnits = unitManager.getBattlingSquad();
+        enemyUnits = unitManager.getEnemySquad();
         setPlayerSlots();
-        setEnemySlots();
+        setEnemySlots();        
     }
-	
+
 	// Update is called once per frame
 	void Update ()
     {
-
-	    if(!playerWon && !enemyWon)
+        if (currentlyBattling && !playerWon && !enemyWon)
         {
             checkPlayerUnits();
             checkEnemyUnits();
             checkDeadUnits();
             tickDown();
-            checkBattleEnd();
-        }       
+            checkBattleEnd();         
+        }
+        else
+        {
+            currentlyBattling = false;
+        }
 	}
 
     // Set the reference of the Player GameObjects 
@@ -77,17 +74,30 @@ public class Battle : MonoBehaviour {
         E4 = GameObject.Find("E4");
     }
 
-    // Check if any player units attack/ability are at tick 0
+    // Check if any player units attack/ability are at tick 0, if they are dead or not
     void checkPlayerUnits()
-    {
-        
+    {       
         foreach(UnitClass unit in playerUnits)
-        {            
+        {
+            // Check if the unit is alive
+            if (unit.currentHealth <= 0)
+            {
+                if(!unit.deadFlag)
+                {
+                    print("(Player) " + unit.firstName + " " + unit.lastName + " has died..");
+                    unit.currentHealth = 0;
+                    unit.currentSpeed = 0;
+                    unit.currentPower = 0;
+                    unit.deadFlag = true;
+                }                
+                continue;
+            }
+
             // Check the attack tick
             if (unit.currentSpeed == 0)
             {                
                 // Do attacking here **********************************
-                print(unit.firstName + "attacks!");
+                unitAttack(unit, true);
                 unit.currentSpeed = unit.maxSpeed;
             }
 
@@ -95,21 +105,36 @@ public class Battle : MonoBehaviour {
             if(unit.currentPower == 0)
             {
                 // Do ability attack here **********************************
-                print(unit.firstName + "uses ability!");
+                print(unit.firstName + " uses ability!");
                 unit.currentPower = unit.maxPower;
             }
         }
     }
 
-    // Check if any enemy units attack/ability are at tick 0
+    // Check if any enemy units attack/ability are at tick 0, if they are dead or not
     void checkEnemyUnits()
     {
         foreach (UnitClass unit in enemyUnits)
         {
+            // Check if the unit is alive
+            if (unit.currentHealth <= 0)
+            {
+                if(!unit.deadFlag)
+                {
+                    print("(Enemy) " + unit.firstName + " " + unit.lastName + " has been eliminated!");
+                    unit.currentHealth = 0;
+                    unit.currentSpeed = 0;
+                    unit.currentPower = 0;
+                }                
+                unit.deadFlag = true;
+                continue;
+            }
+
             // Check the attack tick
             if (unit.currentSpeed == 0)
             {
-                // Do attacking here **********************************
+                // Do attacking here **********************************                
+                unitAttack(unit, false);
                 unit.currentSpeed = unit.maxSpeed;
             }
 
@@ -122,11 +147,35 @@ public class Battle : MonoBehaviour {
         }
     }
 
+    // Performs the attack of the unit, boolean is set true for player and false for enemy
+    void unitAttack(UnitClass unit, bool isPlayer)
+    {
+        int randomTarget;
+        int attackDamage;
+        List<UnitClass> allUnits;
+
+        if (isPlayer)
+        {
+            allUnits = enemyUnits;
+            randomTarget = getRandomEnemy();
+        }
+        else
+        {
+            allUnits = playerUnits;
+            randomTarget = getRandomPlayer();
+        }
+        
+        attackDamage = (int)(unit.att * Random.Range(2 / 3f, 4 / 3f)); // Temporarily use this range instead of dexterity
+        allUnits[randomTarget].currentHealth -= attackDamage;
+        print(unit.firstName + " attacks " + allUnits[randomTarget].firstName + " for " + attackDamage + " damage!");
+    }
+
     // Check if all player units or all enemy units are dead
     void checkDeadUnits()
     {
-        enemyWon = playersUnitsDead();
         playerWon = enemyUnitsDead();
+        if(!playerWon)
+            enemyWon = playersUnitsDead();        
     }
 
     // Check if every player unit is dead
@@ -136,14 +185,45 @@ public class Battle : MonoBehaviour {
         {
             if (!unit.deadFlag)
                 return false;
-        }        
-        return false; // set to true
+        }
+        print("Player is defeated..");
+        return true;
     }
 
     // Check if every enemy unit is dead
     bool enemyUnitsDead()
     {
-        return false;
+        foreach (UnitClass unit in enemyUnits)
+        {
+            if (!unit.deadFlag)
+                return false;
+        }
+        print("Player is victorious!!");
+        return true; 
+    }
+
+    // Get a random player that is alive
+    int getRandomPlayer()
+    {
+        int index = 0;
+        while(true)
+        {
+            index = Random.Range(0, 4);
+            if (!playerUnits[index].deadFlag)
+                return index;
+        }        
+    }
+
+    // Get a random enemy that is alive
+    int getRandomEnemy()
+    {
+        int index = 0;
+        while (true)
+        {
+            index = Random.Range(0, 4);
+            if (!enemyUnits[index].deadFlag)
+                return index;
+        }
     }
 
     // Decrement the tick for every unit
@@ -174,6 +254,7 @@ public class Battle : MonoBehaviour {
                 // Decrement the tick for abilities
                 unitE.currentPower -= 1;
             }
+            //print("Battlelength: " + battleLength);
         }        
     }
 
@@ -181,7 +262,8 @@ public class Battle : MonoBehaviour {
     {
          if (battleLength <= 0)
          {
-              battleEnd = true;
+             currentlyBattling = false;
+             print("Battle is over!!");
          }
     }
 }

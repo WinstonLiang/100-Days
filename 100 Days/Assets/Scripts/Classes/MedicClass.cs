@@ -20,7 +20,7 @@ public class MedicClass : MonoBehaviour {
     public void ablilityHeal(UnitClass unit)
     {
         
-        unit.currentHealth +=
+        //unit.currentHealth +=
     }
 	// Update is called once per frame
 	void Update () {
