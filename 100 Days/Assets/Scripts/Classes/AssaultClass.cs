@@ -3,25 +3,31 @@ using System.Collections;
 
 public class AssaultClass : MonoBehaviour {
 
-    public GameObject character;
-
-    private UnitClass unit;
+    public Sprite idleSprite;
+    public int maxHealth, att, def, maxSpeed, maxPower;    
 
 	// Use this for initialization
 	void Start () 
-    {
-        character = GameObject.Find("Unit");
-        unit = character.GetComponent<UnitClass>();
-        unit.maxHealth = 120;
-        unit.att = 7;
-        unit.def = 7;
-        unit.maxSpeed = 12;
-        unit.maxPower = 60;
-
+    {        
+        maxHealth = 120;
+        att = 7;
+        def = 7;
+        maxSpeed = 12;
+        maxPower = 60;
 	}
 	
 	// Update is called once per frame
-	void Update () {
-	
+	void Update ()
+    {
+	    
 	}
+
+    public void classChange(UnitClass unit)
+    {
+        unit.maxHealth = maxHealth;
+        unit.att = att;
+        unit.def = def;
+        unit.maxSpeed = maxSpeed;
+        unit.maxPower = maxPower;
+    }
 }

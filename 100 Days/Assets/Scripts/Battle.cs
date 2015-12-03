@@ -3,10 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Battle : MonoBehaviour {
-
-    public UnitManager unitManager; // Retrieve squad information
-    public GameManagers gameManager; // Retrieve day information
-    //public Transform playerSlots; // To access the Player Units children
+        
     public bool day;
     public bool paused;
     public bool playerParticipate;
@@ -18,9 +15,16 @@ public class Battle : MonoBehaviour {
     public GameObject E1, E2, E3, E4; // Temporarily set to public for testing 
     public float time;
     public int battleLength;
-    private bool playerWon;
-    private bool enemyWon;    
-    private int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted    
+
+    GameObject unitsData; // To retrieve other scripts
+    UnitManager unitManager; // Retrieve squad information
+    GameManagers gameManager; // Retrieve day information
+    AssaultClass assaultScript;
+    DefenderClass defenderScript;
+    MedicClass medicScript;
+    bool playerWon;
+    bool enemyWon;    
+    int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted    
 
 	// Use this for initialization
 	void Start ()
@@ -31,12 +35,16 @@ public class Battle : MonoBehaviour {
         enemyWon = false;        
         paused = false;
         playerParticipate = true; // Set to true for testing
-        unitManager = GetComponent<UnitManager>();
-        gameManager = GetComponent<GameManagers>();
+        unitsData = GameObject.Find("UnitsData");
+        unitManager = unitsData.GetComponent<UnitManager>();
+        gameManager = unitsData.GetComponent<GameManagers>();
+        assaultScript = GetComponent<AssaultClass>();
+        defenderScript = GetComponent<DefenderClass>();
+        medicScript = GetComponent<MedicClass>();
         playerUnits = unitManager.getBattlingSquad();
         enemyUnits = unitManager.getEnemySquad();
-        setPlayerSlots();
-        setEnemySlots();        
+        setSlots();
+        setSprites();      
     }
 
 	// Update is called once per frame
@@ -56,24 +64,55 @@ public class Battle : MonoBehaviour {
         }
 	}
 
-    // Set the reference of the Player GameObjects 
-    void setPlayerSlots()
+    // Set the sprite depending on the class type
+    void changeSprite(SpriteRenderer renderer, int classType)
+    {
+        if (classType == 0)
+        {
+            // Set Apprentice/Infantry sprite here
+        }
+        else if (classType == 1)
+        {
+            renderer.sprite = assaultScript.idleSprite;
+        }
+        else if (classType == 2)
+        {
+            renderer.sprite = defenderScript.idleSprite;
+        }
+        else if (classType == 3)
+        {
+            renderer.sprite = medicScript.idleSprite;
+        }
+    }
+
+    // Set the reference of the Player annd Enemy GameObjects 
+    void setSlots()
     {
         P1 = GameObject.Find("P1");
         P2 = GameObject.Find("P2");
         P3 = GameObject.Find("P3");
         P4 = GameObject.Find("P4");
-    }
 
-    // Set the reference of the Enemy GameObjects 
-    void setEnemySlots()
-    {
         E1 = GameObject.Find("E1");
         E2 = GameObject.Find("E2");
         E3 = GameObject.Find("E3");
         E4 = GameObject.Find("E4");
     }
 
+    // Sets the player and enemy sprites depending on their classes
+    void setSprites()
+    {
+        GameObject[] playerSlots = { P1, P2, P3, P4 };
+        GameObject[] enemySlots = { E1, E2, E3, E4 };
+
+        for (int i = 0; i < playerSlots.Length; i++)
+        {
+            print("Adding sprite");
+            changeSprite(playerSlots[i].GetComponent<SpriteRenderer>(), playerUnits[i].classType);
+            changeSprite(enemySlots[i].GetComponent<SpriteRenderer>(), enemyUnits[i].classType);
+        }
+    }
+       
     // Check if any player units attack/ability are at tick 0, if they are dead or not
     void checkPlayerUnits()
     {       

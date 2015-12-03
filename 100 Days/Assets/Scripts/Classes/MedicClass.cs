@@ -2,19 +2,18 @@
 using System.Collections;
 
 public class MedicClass : MonoBehaviour {
-    public GameObject character;
 
-    private UnitClass unit;
-	// Use this for initialization
-	void Start () 
+    public Sprite idleSprite;
+    public int maxHealth, att, def, maxSpeed, maxPower;    
+
+    // Use this for initialization
+    void Start () 
     {
-        character = GameObject.Find("Unit");
-        unit = character.GetComponent<UnitClass>();
-        unit.maxHealth = 100;
-        unit.att = 10;
-        unit.def = 7;
-        unit.maxSpeed = 20;
-        unit.maxPower = 40;
+         maxHealth = 100;
+         att = 10;
+         def = 7;
+         maxSpeed = 20;
+         maxPower = 40;
 	}
 	
     public void ablilityHeal(UnitClass unit)
@@ -26,4 +25,13 @@ public class MedicClass : MonoBehaviour {
 	void Update () {
 	
 	}
+
+    public void classChange(UnitClass unit)
+    {
+        unit.maxHealth = maxHealth;
+        unit.att = att;
+        unit.def = def;
+        unit.maxSpeed = maxSpeed;
+        unit.maxPower = maxPower;
+    }
 }

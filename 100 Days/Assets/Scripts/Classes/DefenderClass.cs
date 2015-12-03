@@ -2,24 +2,31 @@
 using System.Collections;
 
 public class DefenderClass : MonoBehaviour {
-    public GameObject character;
 
-    private UnitClass unit;
+    public Sprite idleSprite;
+    public int maxHealth, att, def, maxSpeed, maxPower;    
 
-	// Use this for initialization
-	void Start () 
-    {
-        character = GameObject.Find("Unit");
-        unit = character.GetComponent<UnitClass>();
-        unit.maxHealth = 200;
-        unit.att = 5;
-        unit.def = 10;
-        unit.maxSpeed = 9;
-        unit.maxPower = 50;	    
+    // Use this for initialization
+    void Start () 
+    {              
+         maxHealth = 200;
+         att = 5;
+         def = 10;
+         maxSpeed = 9;
+         maxPower = 50;	    
 	}
 	
 	// Update is called once per frame
 	void Update () {
 	
 	}
+
+    public void classChange(UnitClass unit)
+    {
+        unit.maxHealth = maxHealth;
+        unit.att = att;
+        unit.def = def;
+        unit.maxSpeed = maxSpeed;
+        unit.maxPower = maxPower;
+    }
 }

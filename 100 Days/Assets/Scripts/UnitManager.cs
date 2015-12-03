@@ -4,8 +4,6 @@ using System.Collections.Generic;
 [System.Serializable]
 public class UnitClass
 {
-    public GameObject unitName; //Get the unit name
-    public GameObject unit; //The type of unit    
     public string firstName, lastName;
     public int level = 10;
     public int currentHealth, maxHealth;
@@ -42,28 +40,25 @@ public class UnitClass
         ablity = 0;
 
         firstName = "default firstname";
-        lastName = "default lastname";
-        //nameSelector.getName();
-        //firstName = nameSelector.firstName;
-        //lastName = nameSelector.lastName;
+        lastName = "default lastname";        
     }
 
     // Change the class of the unit
-    public void classChange(int otherClass)
+    public void classChange(int otherClass, UnitClass unit)
     {
         if (otherClass == 1)
         {
-            AssaultClass type = unit.GetComponent<AssaultClass>();
+            GameObject.Find("BattleObject").GetComponent<AssaultClass>().classChange(unit);
         }
         else if (otherClass == 2)
         {
-            DefenderClass type = unit.GetComponent<DefenderClass>();
+            GameObject.Find("BattleObject").GetComponent<DefenderClass>().classChange(unit);
         }
         else if (otherClass == 3)
         {
-            MedicClass type = unit.GetComponent<MedicClass>();
+            GameObject.Find("BattleObject").GetComponent<MedicClass>().classChange(unit);
         }
-    }
+    }  
 
     // Change the stats of the unit
     public void changeStat(int statChange, int orginalStat)
@@ -103,6 +98,11 @@ public class UnitManager : MonoBehaviour
             UnitClass newUnit = new UnitClass();
             nameSelector.getName();            
             newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
+
+            // Temporarily change class to test sprites
+            newUnit.classChange(add, newUnit);
+            newUnit.classType = add;
+
             allPlayerUnits.Add(newUnit);
             print("Added Player: " + allPlayerUnits[add].firstName + " " + allPlayerUnits[add].lastName);                    
         }        
@@ -113,6 +113,11 @@ public class UnitManager : MonoBehaviour
             UnitClass newUnit = new UnitClass();
             nameSelector.getName();
             newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
+
+            // Temporarily change class to test sprites
+            newUnit.classChange(add, newUnit);
+            newUnit.classType = add;
+
             allEnemyUnits.Add(newUnit);
             print("Added Enemy: " + allEnemyUnits[add].firstName + " " + allEnemyUnits[add].lastName);
         }  
@@ -121,15 +126,13 @@ public class UnitManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //print("update: " + allPlayerUnits.Count);
+        
     }
 
     ///Return the squad in battle
     public List<UnitClass> getBattlingSquad()
     {
-        List<UnitClass> unitsInBattle = new List<UnitClass>(maxPlayers);
-
-        //print(allPlayerUnits.Count);
+        List<UnitClass> unitsInBattle = new List<UnitClass>(maxPlayers); 
 
         foreach (UnitClass unit in allPlayerUnits)
         {            
