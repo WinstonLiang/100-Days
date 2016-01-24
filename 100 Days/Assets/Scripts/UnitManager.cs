@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+//using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class UnitClass
@@ -44,21 +45,27 @@ public class UnitClass
     }
 
     // Change the class of the unit
-    public void classChange(int otherClass, UnitClass unit)
+    public void classChange(UnitClass unit)
     {
-        if (otherClass == 1)
+        getClassScript(unit.classType).classChange(unit) ;
+    }
+
+    // Retrieves the reference to it's own class script
+    public Classes getClassScript(int classType)
+    {
+        if (classType == 1)
         {
-            GameObject.Find("BattleObject").GetComponent<AssaultClass>().classChange(unit);
+            return GameObject.Find("BattleObject").GetComponent<AssaultClass>();
         }
-        else if (otherClass == 2)
+        else if (classType == 2)
         {
-            GameObject.Find("BattleObject").GetComponent<DefenderClass>().classChange(unit);
+            return GameObject.Find("BattleObject").GetComponent<DefenderClass>();
         }
-        else if (otherClass == 3)
+        else // Add more if statements for more classes (classType == 3)
         {
-            GameObject.Find("BattleObject").GetComponent<MedicClass>().classChange(unit);
+            return GameObject.Find("BattleObject").GetComponent<MedicClass>();
         }
-    }  
+    }
 
     // Change the stats of the unit
     public void changeStat(int statChange, int orginalStat)
@@ -86,7 +93,8 @@ public class UnitManager : MonoBehaviour
 
     // Use this for initialization
     void Start()
-    {
+    {     
+        DontDestroyOnLoad(transform.gameObject);
         nameSelector = GetComponent<NameSelector>();
         allPlayerUnits.Capacity = maxPlayers;
         allEnemyUnits.Capacity = maxPlayers;
@@ -100,8 +108,8 @@ public class UnitManager : MonoBehaviour
             newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
 
             // Temporarily change class to test sprites
-            newUnit.classChange(add, newUnit);
             newUnit.classType = add;
+            newUnit.classChange(newUnit);            
 
             allPlayerUnits.Add(newUnit);
             print("Added Player: " + allPlayerUnits[add].firstName + " " + allPlayerUnits[add].lastName);                    
@@ -115,12 +123,17 @@ public class UnitManager : MonoBehaviour
             newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
 
             // Temporarily change class to test sprites
-            newUnit.classChange(add, newUnit);
             newUnit.classType = add;
+            newUnit.classChange(newUnit);            
 
             allEnemyUnits.Add(newUnit);
             print("Added Enemy: " + allEnemyUnits[add].firstName + " " + allEnemyUnits[add].lastName);
-        }  
+        }
+
+        // Switch the level to test dont destroy on load
+        print("Loading level now");
+        Application.LoadLevel("LeonTest");
+        // Replace with SceneManager.LoadLevel("LeonTest"); after updating to 5.3
     }
 
     // Update is called once per frame

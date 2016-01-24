@@ -38,9 +38,13 @@ public class Battle : MonoBehaviour {
         unitsData = GameObject.Find("UnitsData");
         unitManager = unitsData.GetComponent<UnitManager>();
         gameManager = unitsData.GetComponent<GameManagers>();
+
+        // Assign class scripts
         assaultScript = GetComponent<AssaultClass>();
         defenderScript = GetComponent<DefenderClass>();
         medicScript = GetComponent<MedicClass>();
+
+
         playerUnits = unitManager.getBattlingSquad();
         enemyUnits = unitManager.getEnemySquad();
         setSlots();
@@ -146,6 +150,7 @@ public class Battle : MonoBehaviour {
                 // Do ability attack here **********************************
                 print(unit.firstName + " uses ability!");
                 unit.currentPower = unit.maxPower;
+                unit.getClassScript(unit.classType).ability1(enemyUnits, getRandomEnemy(), true);
             }
         }
     }
@@ -182,6 +187,7 @@ public class Battle : MonoBehaviour {
             {
                 // Do ability attack here **********************************
                 unit.currentPower = unit.maxPower;
+                unit.getClassScript(unit.classType).ability1(playerUnits, getRandomPlayer(), true);
             }
         }
     }

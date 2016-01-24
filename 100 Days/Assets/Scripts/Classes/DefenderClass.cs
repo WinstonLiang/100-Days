@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
-public class DefenderClass : MonoBehaviour {
+public class DefenderClass : Classes {
 
     public Sprite idleSprite;
     public int maxHealth, att, def, maxSpeed, maxPower;    
@@ -9,11 +9,6 @@ public class DefenderClass : MonoBehaviour {
     // Use this for initialization
     void Start () 
     {              
-         maxHealth = 200;
-         att = 5;
-         def = 10;
-         maxSpeed = 9;
-         maxPower = 50;	    
 	}
 	
 	// Update is called once per frame
@@ -21,12 +16,22 @@ public class DefenderClass : MonoBehaviour {
 	
 	}
 
-    public void classChange(UnitClass unit)
+    public override void classChange(UnitClass unit)
     {
         unit.maxHealth = maxHealth;
         unit.att = att;
         unit.def = def;
         unit.maxSpeed = maxSpeed;
         unit.maxPower = maxPower;
+    }
+
+    public override void ability1(List<UnitClass> units, int enemy, bool isPlayer)
+    {
+
+    }
+
+    public override void ability2(List<UnitClass> units, int enemy, bool isPlayer)
+    {
+
     }
 }
