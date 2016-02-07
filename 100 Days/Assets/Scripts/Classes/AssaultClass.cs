@@ -6,7 +6,7 @@ public class AssaultClass : Classes {
     public Sprite idleSprite;
     public int maxHealth, att, def, maxSpeed, maxPower,
                totalAbilities;
-    public bool human;    
+    public bool human, receiveDmgModify; // Flag whether class has skills that modify dmg received by team     
 
 	// Use this for initialization
 	void Start () 
@@ -22,8 +22,11 @@ public class AssaultClass : Classes {
     public override void classChange(UnitClass unit)
     {
         unit.maxHealth = maxHealth;
+        unit.currentHealth = maxHealth;
         unit.att = att;
         unit.def = def;
+        unit.currentSpeed = maxSpeed;
+        unit.currentPower = maxPower;
         unit.maxSpeed = maxSpeed;
         unit.maxPower = maxPower;
     }
@@ -47,6 +50,21 @@ public class AssaultClass : Classes {
     }
 
     public override void ability2(List<UnitClass> units, int enemy, bool isPlayer)
+    {
+
+    }
+
+    public override void receiveDmgAbility1(List<UnitClass> units, UnitClass target, ref int ally, ref bool activated)
+    {
+
+    }
+
+    public override bool returnReceiveDmgModify() 
+    {
+        return receiveDmgModify;
+    }
+
+    public override void classTick(UnitClass unit)
     {
 
     }

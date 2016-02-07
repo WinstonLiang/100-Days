@@ -13,10 +13,11 @@ public class UnitClass
     public int currentPower, maxPower;
     public int crit, dodge;
     public int substat;
-    public bool deadFlag;
+    public bool deadFlag, healing;
     public int classType;
     public int squad;
     public int ablity;
+    public int healingCounter;
 
     private int gender;
 
@@ -39,6 +40,8 @@ public class UnitClass
         classType = 0;
         squad = 0;
         ablity = 0;
+        healing = false;
+
 
         firstName = "default firstname";
         lastName = "default lastname";        

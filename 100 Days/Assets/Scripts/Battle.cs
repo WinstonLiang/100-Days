@@ -22,6 +22,7 @@ public class Battle : MonoBehaviour {
     AssaultClass assaultScript;
     DefenderClass defenderScript;
     MedicClass medicScript;
+    
     bool playerWon;
     bool enemyWon;    
     int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted    
@@ -74,6 +75,7 @@ public class Battle : MonoBehaviour {
         if (classType == 0)
         {
             // Set Apprentice/Infantry sprite here
+            renderer.sprite = medicScript.idleSprite;
         }
         else if (classType == 1)
         {
@@ -197,8 +199,10 @@ public class Battle : MonoBehaviour {
     {
         int randomTarget;
         int attackDamage;
+        bool activated = false;
         List<UnitClass> allUnits;
 
+        // Set the allUnits variable as appropriate and a random target randomly
         if (isPlayer)
         {
             allUnits = enemyUnits;
@@ -209,7 +213,17 @@ public class Battle : MonoBehaviour {
             allUnits = playerUnits;
             randomTarget = getRandomPlayer();
         }
-        
+
+        // Check if there is a living class that can modify damage received (e.g. defender)
+        foreach (UnitClass targetUnit in allUnits)
+        {
+            if (!targetUnit.deadFlag && targetUnit != allUnits[randomTarget] && !activated && 
+                targetUnit.getClassScript(targetUnit.classType).returnReceiveDmgModify())
+            {
+                targetUnit.getClassScript(targetUnit.classType).receiveDmgAbility1(allUnits, targetUnit, ref randomTarget, ref activated);
+            }
+        }
+
         attackDamage = (int)(unit.att * Random.Range(2 / 3f, 4 / 3f)); // Temporarily use this range instead of dexterity
         allUnits[randomTarget].currentHealth -= attackDamage;
         print(unit.firstName + " attacks " + allUnits[randomTarget].firstName + " for " + attackDamage + " damage!");
@@ -289,6 +303,9 @@ public class Battle : MonoBehaviour {
                                 
                 // Decrement the tick for abilities
                 unitP.currentPower -= 1;
+
+                // Decrement the tick for class
+                unitP.getClassScript(unitP.classType).classTick(unitP);
             }
 
             foreach (UnitClass unitE in enemyUnits)
@@ -298,9 +315,12 @@ public class Battle : MonoBehaviour {
 
                 // Decrement the tick for abilities
                 unitE.currentPower -= 1;
+
+                // Decrement the tick for class
+                unitE.getClassScript(unitE.classType).classTick(unitE);
             }
             //print("Battlelength: " + battleLength);
-        }        
+        }
     }
 
     void checkBattleEnd()

@@ -16,4 +16,7 @@ public class Classes : MonoBehaviour {
     public virtual void classChange(UnitClass unit) {}
     public virtual void ability1(List<UnitClass> units, int enemy, bool isPlayer) { }
     public virtual void ability2(List<UnitClass> units, int enemy, bool isPlayer) { }
+    public virtual void receiveDmgAbility1(List<UnitClass> units, UnitClass target, ref int ally, ref bool activated) { }
+    public virtual bool returnReceiveDmgModify() { return false; }
+    public virtual void classTick(UnitClass unit) {}
 }
