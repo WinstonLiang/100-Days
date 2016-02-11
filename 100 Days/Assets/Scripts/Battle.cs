@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class Battle : MonoBehaviour {
         
@@ -70,24 +71,24 @@ public class Battle : MonoBehaviour {
 	}
 
     // Set the sprite depending on the class type
-    void changeSprite(SpriteRenderer renderer, int classType)
+    void changeSprite(Image image, int classType)
     {
         if (classType == 0)
         {
             // Set Apprentice/Infantry sprite here
-            renderer.sprite = medicScript.idleSprite;
+            image.sprite = medicScript.idleSprite;
         }
         else if (classType == 1)
         {
-            renderer.sprite = assaultScript.idleSprite;
+            image.sprite = assaultScript.idleSprite;
         }
         else if (classType == 2)
         {
-            renderer.sprite = defenderScript.idleSprite;
+            image.sprite = defenderScript.idleSprite;
         }
         else if (classType == 3)
         {
-            renderer.sprite = medicScript.idleSprite;
+            image.sprite = medicScript.idleSprite;
         }
     }
 
@@ -114,8 +115,8 @@ public class Battle : MonoBehaviour {
         for (int i = 0; i < playerSlots.Length; i++)
         {
             print("Adding sprite");
-            changeSprite(playerSlots[i].GetComponent<SpriteRenderer>(), playerUnits[i].classType);
-            changeSprite(enemySlots[i].GetComponent<SpriteRenderer>(), enemyUnits[i].classType);
+            changeSprite(playerSlots[i].GetComponent<Image>(), playerUnits[i].classType);
+            changeSprite(enemySlots[i].GetComponent<Image>(), enemyUnits[i].classType);
         }
     }
        
