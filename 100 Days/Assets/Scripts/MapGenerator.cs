@@ -30,11 +30,11 @@ public class MapGenerator : MonoBehaviour {
                for (int y = 0; y <= biomeSize; y++)
                {
                     tile newTile = new tile();
-                    newTile.tilePosition = new Vector3(x,-y * 1.1f +(x % 2) * .5f, 0);
+                    newTile.tilePosition = new Vector3(x*1.05f,(-y  +(x % 2) * .5f) * 1.12f, 0);
                     if (Random.Range(0, 1f) < 0.25)
                     {
                          newTile.battle = true;
-                         
+                         /*
                          for (int add = 0; add < newTile.tileEnemies.Capacity; add++)
                          {
                               
@@ -50,7 +50,7 @@ public class MapGenerator : MonoBehaviour {
                               print("Added Enemy: " + newTile.tileEnemies[add].firstName + " " + newTile.tileEnemies[add].lastName);
                                
                          }
-                          
+                          */
                     }
                     generatedMap.Add(newTile.tilePosition, newTile);
                }
