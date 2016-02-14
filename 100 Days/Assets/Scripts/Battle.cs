@@ -20,6 +20,7 @@ public class Battle : MonoBehaviour {
     GameObject unitsData; // To retrieve other scripts
     UnitManager unitManager; // Retrieve squad information
     GameManagers gameManager; // Retrieve day information
+    BattleUI battleUI; // Update battle UI
     AssaultClass assaultScript;
     DefenderClass defenderScript;
     MedicClass medicScript;
@@ -40,12 +41,12 @@ public class Battle : MonoBehaviour {
         unitsData = GameObject.Find("UnitsData");
         unitManager = unitsData.GetComponent<UnitManager>();
         gameManager = unitsData.GetComponent<GameManagers>();
+        battleUI = GetComponent<BattleUI>();
 
         // Assign class scripts
         assaultScript = GetComponent<AssaultClass>();
         defenderScript = GetComponent<DefenderClass>();
         medicScript = GetComponent<MedicClass>();
-
 
         playerUnits = unitManager.getBattlingSquad();
         enemyUnits = unitManager.getEnemySquad();
@@ -320,6 +321,7 @@ public class Battle : MonoBehaviour {
                 // Decrement the tick for class
                 unitE.getClassScript(unitE.classType).classTick(unitE);
             }
+            battleUI.updateBattleUI();
             //print("Battlelength: " + battleLength);
         }
     }

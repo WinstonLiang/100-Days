@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-//using UnityEngine.SceneManagement;
+using UnityEngine.SceneManagement;
 
 [System.Serializable]
 public class UnitClass
@@ -135,8 +135,7 @@ public class UnitManager : MonoBehaviour
 
         // Switch the level to test dont destroy on load
         print("Loading level now");
-        Application.LoadLevel("LeonTest");
-        // Replace with SceneManager.LoadLevel("LeonTest"); after updating to 5.3
+        SceneManager.LoadScene("LeonTest");
     }
 
     // Update is called once per frame
