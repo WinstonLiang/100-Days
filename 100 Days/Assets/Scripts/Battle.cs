@@ -11,9 +11,7 @@ public class Battle : MonoBehaviour {
     public bool currentlyBattling;
     public float tickTime; // Length of each tick time
     public List<UnitClass> playerUnits; // A list of playerUnits grabbed from unitManager
-    public GameObject P1, P2, P3, P4; // Temporarily set to public for testing
     public List<UnitClass> enemyUnits; // A list of enemyUnits grabbed from enemyManager
-    public GameObject E1, E2, E3, E4; // Temporarily set to public for testing 
     public float time;
     public int battleLength;
 
@@ -21,9 +19,6 @@ public class Battle : MonoBehaviour {
     UnitManager unitManager; // Retrieve squad information
     GameManagers gameManager; // Retrieve day information
     BattleUI battleUI; // Update battle UI
-    AssaultClass assaultScript;
-    DefenderClass defenderScript;
-    MedicClass medicScript;
     
     bool playerWon;
     bool enemyWon;    
@@ -43,15 +38,8 @@ public class Battle : MonoBehaviour {
         gameManager = unitsData.GetComponent<GameManagers>();
         battleUI = GetComponent<BattleUI>();
 
-        // Assign class scripts
-        assaultScript = GetComponent<AssaultClass>();
-        defenderScript = GetComponent<DefenderClass>();
-        medicScript = GetComponent<MedicClass>();
-
         playerUnits = unitManager.getBattlingSquad();
-        enemyUnits = unitManager.getEnemySquad();
-        setSlots();
-        setSprites();      
+        enemyUnits = unitManager.getEnemySquad(); 
     }
 
 	// Update is called once per frame
@@ -70,56 +58,6 @@ public class Battle : MonoBehaviour {
             currentlyBattling = false;
         }
 	}
-
-    // Set the sprite depending on the class type
-    void changeSprite(Image image, int classType)
-    {
-        if (classType == 0)
-        {
-            // Set Apprentice/Infantry sprite here
-            image.sprite = medicScript.idleSprite;
-        }
-        else if (classType == 1)
-        {
-            image.sprite = assaultScript.idleSprite;
-        }
-        else if (classType == 2)
-        {
-            image.sprite = defenderScript.idleSprite;
-        }
-        else if (classType == 3)
-        {
-            image.sprite = medicScript.idleSprite;
-        }
-    }
-
-    // Set the reference of the Player annd Enemy GameObjects 
-    void setSlots()
-    {
-        P1 = GameObject.Find("P1");
-        P2 = GameObject.Find("P2");
-        P3 = GameObject.Find("P3");
-        P4 = GameObject.Find("P4");
-
-        E1 = GameObject.Find("E1");
-        E2 = GameObject.Find("E2");
-        E3 = GameObject.Find("E3");
-        E4 = GameObject.Find("E4");
-    }
-
-    // Sets the player and enemy sprites depending on their classes
-    void setSprites()
-    {
-        GameObject[] playerSlots = { P1, P2, P3, P4 };
-        GameObject[] enemySlots = { E1, E2, E3, E4 };
-
-        for (int i = 0; i < playerSlots.Length; i++)
-        {
-            print("Adding sprite");
-            changeSprite(playerSlots[i].GetComponent<Image>(), playerUnits[i].classType);
-            changeSprite(enemySlots[i].GetComponent<Image>(), enemyUnits[i].classType);
-        }
-    }
        
     // Check if any player units attack/ability are at tick 0, if they are dead or not
     void checkPlayerUnits()
@@ -173,8 +111,8 @@ public class Battle : MonoBehaviour {
                     unit.currentHealth = 0;
                     unit.currentSpeed = 0;
                     unit.currentPower = 0;
-                }                
-                unit.deadFlag = true;
+                    unit.deadFlag = true;
+                }                                
                 continue;
             }
 
@@ -300,26 +238,32 @@ public class Battle : MonoBehaviour {
             battleLength--;
             foreach (UnitClass unitP in playerUnits)
             {
-                // Decrement the tick for attacks
-                unitP.currentSpeed -= 1;
-                                
-                // Decrement the tick for abilities
-                unitP.currentPower -= 1;
+                if(!unitP.deadFlag)
+                {
+                    // Decrement the tick for attacks
+                    unitP.currentSpeed -= 1;
 
-                // Decrement the tick for class
-                unitP.getClassScript(unitP.classType).classTick(unitP);
+                    // Decrement the tick for abilities
+                    unitP.currentPower -= 1;
+
+                    // Decrement the tick for class
+                    unitP.getClassScript(unitP.classType).classTick(unitP);
+                }
             }
 
             foreach (UnitClass unitE in enemyUnits)
             {
-                // Decrement the tick for attacks
-                unitE.currentSpeed -= 1;
+                if(!unitE.deadFlag)
+                {
+                    // Decrement the tick for attacks
+                    unitE.currentSpeed -= 1;
 
-                // Decrement the tick for abilities
-                unitE.currentPower -= 1;
+                    // Decrement the tick for abilities
+                    unitE.currentPower -= 1;
 
-                // Decrement the tick for class
-                unitE.getClassScript(unitE.classType).classTick(unitE);
+                    // Decrement the tick for class
+                    unitE.getClassScript(unitE.classType).classTick(unitE);
+                }
             }
             battleUI.updateBattleUI();
             //print("Battlelength: " + battleLength);
