@@ -12,6 +12,7 @@ public class BattleUI : MonoBehaviour {
     public GameObject[] playerSlots = new GameObject[4]; // Temporarily set to public for testing
     public GameObject[] enemySlots = new GameObject[4]; // Temporarily set to public for testing 
 
+    GameObject classScriptsGameObject; // A reference to the GameObject containing all the class scripts
     AssaultClass assaultScript;
     DefenderClass defenderScript;
     MedicClass medicScript;
@@ -23,6 +24,7 @@ public class BattleUI : MonoBehaviour {
         initBars();
         initializeBattleUI();
         setSlots();
+        classScriptsGameObject = GameObject.Find("ClassScripts");
         getClassSprites();
         setSprites();     
 	}
@@ -62,9 +64,9 @@ public class BattleUI : MonoBehaviour {
     void getClassSprites()
     {
         // Assign class scripts
-        assaultScript = GetComponent<AssaultClass>();
-        defenderScript = GetComponent<DefenderClass>();
-        medicScript = GetComponent<MedicClass>();
+        assaultScript = classScriptsGameObject.GetComponent<AssaultClass>();
+        defenderScript = classScriptsGameObject.GetComponent<DefenderClass>();
+        medicScript = classScriptsGameObject.GetComponent<MedicClass>();
     }
 
     // Set the reference of the Player annd Enemy GameObjects 
@@ -108,7 +110,7 @@ public class BattleUI : MonoBehaviour {
     {
         for (int i = 0; i < playerSlots.Length; i++)
         {
-            print("Adding sprite");
+            print("Setting sprite");
             changeSprite(playerSlots[i].GetComponent<Image>(), battleScript.playerUnits[i].classType);
             changeSprite(enemySlots[i].GetComponent<Image>(), battleScript.enemyUnits[i].classType);
         }
@@ -128,8 +130,7 @@ public class BattleUI : MonoBehaviour {
             ColorBlock colorBlock = hpSlider[i].colors;
             colorBlock.disabledColor = new Color(currentHP >= maxHP/2 ? (1-currentPercentage)*2 : 1, 
                                                  currentHP < maxHP ? currentPercentage*2 : 1, 0);
-            hpSlider[i].colors = colorBlock;
-            print("Red: " + (1 - currentPercentage) + " - Green: " + currentPercentage);
+            hpSlider[i].colors = colorBlock;            
         }
     }
 
