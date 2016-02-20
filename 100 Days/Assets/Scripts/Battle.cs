@@ -207,7 +207,7 @@ public class Battle : MonoBehaviour {
         int index = 0;
         while(true)
         {
-            index = Random.Range(0, 4);
+            index = Random.Range(0, playerUnits.Count);
             if (!playerUnits[index].deadFlag)
                 return index;
         }        
@@ -219,7 +219,7 @@ public class Battle : MonoBehaviour {
         int index = 0;
         while (true)
         {
-            index = Random.Range(0, 4);
+            index = Random.Range(0, enemyUnits.Count);
             if (!enemyUnits[index].deadFlag)
                 return index;
         }

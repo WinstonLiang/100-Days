@@ -6,13 +6,16 @@ using System.Collections.Generic;
 public class BattleUI : MonoBehaviour {
 
     public Battle battleScript; // To grab the information of each unit to update UI (HP/Ability/etc)
-    public Slider[] hpSlider = new Slider[4]; // To update the sprites of the hp bars
-    public Slider[] abilitySlider = new Slider[4]; // To update the sprites of the ability bars
+    public Slider[] hpSlider; // To update the sprites of the hp bars
+    public Slider[] abilitySlider; // To update the sprites of the ability bars
 
-    public GameObject[] playerSlots = new GameObject[4]; // Temporarily set to public for testing
-    public GameObject[] enemySlots = new GameObject[4]; // Temporarily set to public for testing 
+    public GameObject[] playerSlots; // Temporarily set to public for testing
+    public GameObject[] enemySlots; // Temporarily set to public for testing 
+    public GameObject[] charUIs; // To disable the UI for nonexistent units
 
-    GameObject classScriptsGameObject; // A reference to the GameObject containing all the class scripts
+    int playerUnitCount, enemyUnitCount; // Used to display bars only for existing units
+    int maximumSlots = 4; // Set maximum slots possible (for possible future changes)
+
     AssaultClass assaultScript;
     DefenderClass defenderScript;
     MedicClass medicScript;
@@ -21,12 +24,20 @@ public class BattleUI : MonoBehaviour {
     void Start ()
     {
         battleScript = GetComponent<Battle>();
+        playerUnitCount = battleScript.playerUnits.Count;
+        enemyUnitCount = battleScript.enemyUnits.Count;
+        hpSlider = new Slider[maximumSlots];
+        abilitySlider = new Slider[maximumSlots];
+        playerSlots =  new GameObject[maximumSlots];        
+        enemySlots =  new GameObject[maximumSlots];
+        charUIs = new GameObject[maximumSlots];  
+
         initBars();
         initializeBattleUI();
         setSlots();
-        classScriptsGameObject = GameObject.Find("ClassScripts");
         getClassSprites();
-        setSprites();     
+        setSprites();
+        disableUnusedSlots();
 	}
 	
 	// Update is called once per frame
@@ -35,10 +46,31 @@ public class BattleUI : MonoBehaviour {
 
 	}
 
+    // Disables HP bars and slots that aren't used
+    void disableUnusedSlots()
+    {
+        for (int i = 0; i < maximumSlots; i++)
+        {
+            // Disable player slots and HP/Ability Bars
+            if (playerUnitCount < i + 1)
+            {
+                playerSlots[i].SetActive(false);
+                charUIs[i].SetActive(false);
+            }
+
+            // Disable enemy slots
+            if (enemyUnitCount < i + 1)
+            {
+                enemySlots[i].SetActive(false);
+            }
+        }
+    }
+
     // Initialize the HP/Ability bars
     void initBars()
     {
-        for (int i = 0; i < battleScript.playerUnits.Count; i++)
+        // For the player units
+        for (int i = 0; i < maximumSlots; i++)
         {
             hpSlider[i] = GameObject.Find("hpSlider" + (i + 1)).GetComponent<Slider>();
             abilitySlider[i] = GameObject.Find("abilitySlider" + (i + 1)).GetComponent<Slider>();
@@ -48,7 +80,7 @@ public class BattleUI : MonoBehaviour {
     // Initialize the sprites to hpImage
     void initializeBattleUI()
     {
-        for (int i = 0; i < hpSlider.Length; i++)
+        for (int i = 0; i < playerUnitCount; i++)
         {
             hpSlider[i].maxValue = battleScript.playerUnits[i].maxHealth;
             hpSlider[i].value = battleScript.playerUnits[i].currentHealth;
@@ -64,22 +96,20 @@ public class BattleUI : MonoBehaviour {
     void getClassSprites()
     {
         // Assign class scripts
-        assaultScript = classScriptsGameObject.GetComponent<AssaultClass>();
-        defenderScript = classScriptsGameObject.GetComponent<DefenderClass>();
-        medicScript = classScriptsGameObject.GetComponent<MedicClass>();
+        assaultScript = GameObject.Find("AssaultGO").GetComponent<AssaultClass>();
+        defenderScript = GameObject.Find("DefenderGO").GetComponent<DefenderClass>();
+        medicScript = GameObject.Find("MedicGO").GetComponent<MedicClass>();
     }
 
     // Set the reference of the Player annd Enemy GameObjects 
     void setSlots()
     {
-        for (int i = 0; i < playerSlots.Length; i++)
+        for (int i = 0; i < maximumSlots; i++)
         {
             playerSlots[i] = GameObject.Find("P" + (i + 1));
-        }
-
-        for (int i = 0; i < enemySlots.Length; i++)
-        {
             enemySlots[i] = GameObject.Find("E" + (i + 1));
+            charUIs[i] = GameObject.Find("CharUI" + (i + 1));
+
         }
     }
 
@@ -108,10 +138,15 @@ public class BattleUI : MonoBehaviour {
     // Sets the player and enemy sprites depending on their classes
     void setSprites()
     {
-        for (int i = 0; i < playerSlots.Length; i++)
+        for (int i = 0; i < playerUnitCount; i++)
         {
             print("Setting sprite");
             changeSprite(playerSlots[i].GetComponent<Image>(), battleScript.playerUnits[i].classType);
+        }
+
+        for (int i = 0; i < enemyUnitCount; i++)
+        {
+            print("Setting sprite");
             changeSprite(enemySlots[i].GetComponent<Image>(), battleScript.enemyUnits[i].classType);
         }
     }
@@ -121,7 +156,7 @@ public class BattleUI : MonoBehaviour {
     {
         float currentHP, maxHP, currentPercentage;
 
-        for (int i = 0; i < hpSlider.Length; i++)
+        for (int i = 0; i < playerUnitCount; i++)
         {
             currentHP = battleScript.playerUnits[i].currentHealth;
             maxHP = battleScript.playerUnits[i].maxHealth;
@@ -137,7 +172,7 @@ public class BattleUI : MonoBehaviour {
     // Change dead player image to dark tint
     void setDeadColors()
     {
-        for (int i = 0; i < battleScript.playerUnits.Count; i++)
+        for (int i = 0; i < playerUnitCount; i++)
         {
             if(battleScript.playerUnits[i].deadFlag)
             {
@@ -145,7 +180,7 @@ public class BattleUI : MonoBehaviour {
             }
         }
 
-        for (int i = 0; i < battleScript.enemyUnits.Count; i++)
+        for (int i = 0; i < enemyUnitCount; i++)
         {
             if (battleScript.enemyUnits[i].deadFlag)
             {
@@ -157,7 +192,7 @@ public class BattleUI : MonoBehaviour {
     // Update battle UI
     public void updateBattleUI()
     {
-        for (int i = 0; i < hpSlider.Length; i++)
+        for (int i = 0; i < playerUnitCount; i++)
         {
             hpSlider[i].value = battleScript.playerUnits[i].currentHealth;
             abilitySlider[i].value = battleScript.playerUnits[i].currentPower;

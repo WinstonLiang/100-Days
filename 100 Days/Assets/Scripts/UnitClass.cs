@@ -58,15 +58,15 @@ public class UnitClass
     {
         if (classType == 1)
         {
-            return GameObject.Find("ClassScripts").GetComponent<AssaultClass>();
+            return GameObject.Find("AssaultGO").GetComponent<AssaultClass>();
         }
         else if (classType == 2)
         {
-            return GameObject.Find("ClassScripts").GetComponent<DefenderClass>();
+            return GameObject.Find("DefenderGO").GetComponent<DefenderClass>();
         }
         else // Add more if statements for more classes (classType == 3)
         {
-            return GameObject.Find("ClassScripts").GetComponent<MedicClass>();
+            return GameObject.Find("MedicGO").GetComponent<MedicClass>();
         }
     }
 

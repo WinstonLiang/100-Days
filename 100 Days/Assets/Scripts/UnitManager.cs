@@ -6,7 +6,8 @@ public class UnitManager : MonoBehaviour
 {
     public NameSelector nameSelector;
     public List<UnitClass> allPlayerUnits = new List<UnitClass>(4);
-    public List<UnitClass> allEnemyUnits = new List<UnitClass>(4); 
+    public List<UnitClass> allEnemyUnits = new List<UnitClass>(4);
+    public int initialPlayerUnitCount = 3;
     public int maxPlayers = 4;    
     public int battlingSquad = 0;
 
@@ -22,33 +23,15 @@ public class UnitManager : MonoBehaviour
 
         // For testing, Simulates autopopulating the player units with
         // starting amount of units when game is started
-        for (int add = 0; add < allPlayerUnits.Capacity; add++)
-        {            
-            UnitClass newUnit = new UnitClass();
-            nameSelector.getName();            
-            newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
-
-            // Temporarily change class to test sprites
-            newUnit.classType = add;
-            newUnit.classChange(newUnit);            
-
-            allPlayerUnits.Add(newUnit);
-            print("Added Player: " + allPlayerUnits[add].firstName + " " + allPlayerUnits[add].lastName);                    
+        for (int add = 0; add < initialPlayerUnitCount; add++)
+        {
+            addNewUnit(true, add);
         }        
 
         // Same applies with enemies for testing purposes
         for (int add = 0; add < allEnemyUnits.Capacity; add++)
         {
-            UnitClass newUnit = new UnitClass();
-            nameSelector.getName();
-            newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
-
-            // Temporarily change class to test sprites
-            newUnit.classType = add;
-            newUnit.classChange(newUnit);            
-
-            allEnemyUnits.Add(newUnit);
-            print("Added Enemy: " + allEnemyUnits[add].firstName + " " + allEnemyUnits[add].lastName);
+            addNewUnit(false, add);
         }
 
         // Switch the level to test dont destroy on load
@@ -60,6 +43,28 @@ public class UnitManager : MonoBehaviour
     void Update()
     {
         
+    }
+
+    // Adds a unit when called (e.g. start new game, recruit a new member)
+    void addNewUnit(bool player, int classType)
+    {
+        UnitClass newUnit = new UnitClass();
+        nameSelector.getName();
+        newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
+        newUnit.classType = classType;
+        newUnit.classChange(newUnit);
+
+        if(player)
+        {
+            allPlayerUnits.Add(newUnit);
+            print("Added Player: " + newUnit.firstName + " " + newUnit.lastName);     
+        }
+        else
+        {
+            allEnemyUnits.Add(newUnit);
+            print("Added Enemy: " + newUnit.firstName + " " + newUnit.lastName);
+        }
+   
     }
 
     ///Return the squad in battle
