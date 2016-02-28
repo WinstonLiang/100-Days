@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class SceneTest : MonoBehaviour {
      public int count = 0;
@@ -7,9 +8,9 @@ public class SceneTest : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
           print("start");
-          if (Application.loadedLevelName == "TestScene")
+          if (SceneManager.GetActiveScene().name == "TestScene")
           {
-               Application.LoadLevel("WinstonTest");
+              SceneManager.LoadScene("WinstonTest");
           }
 	}
 	
@@ -19,7 +20,7 @@ public class SceneTest : MonoBehaviour {
           print(count);
           if (count > 1000)
           {
-               Application.LoadLevel("TestScene");
+              SceneManager.LoadScene("TestScene");
           }
 	}
 }

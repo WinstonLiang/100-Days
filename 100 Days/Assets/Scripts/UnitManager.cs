@@ -3,50 +3,84 @@ using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
 public class UnitManager : MonoBehaviour
-{
-    public NameSelector nameSelector;
+{     
     public List<UnitClass> allPlayerUnits = new List<UnitClass>(4);
-    public List<UnitClass> allEnemyUnits = new List<UnitClass>(4);
+    public List<UnitClass>[][] allEnemyUnits;
     public int initialPlayerUnitCount = 3;
     public int maxPlayers = 4;    
-    public int battlingSquad = 0;
 
+    // To be used by Battle script
+    public int battlingSquad = 0;
+    public int enemyXCoord = 0;
+    public int enemyYCoord = 0;
+
+    private NameSelector nameSelector;
     private int enemySet = 0; // this variable should be retrieved from the Map/Game Manager elsewhere
+    private int maxX, maxY;   // Size of the map
+
+    // Hold a reference to this object to keep singleton
+    private static UnitManager unitManagerRef;
 
     // Use this for initialization
     void Start()
-    {     
-        DontDestroyOnLoad(transform.gameObject);
-        nameSelector = GetComponent<NameSelector>();
-        allPlayerUnits.Capacity = maxPlayers;
-        allEnemyUnits.Capacity = maxPlayers;
-
-        // For testing, Simulates autopopulating the player units with
-        // starting amount of units when game is started
-        for (int add = 0; add < initialPlayerUnitCount; add++)
+    {
+        // To prevent duplicate unitManagers
+        if (unitManagerRef == null)
         {
-            addNewUnit(true, add);
-        }        
+            unitManagerRef = this;
+            DontDestroyOnLoad(gameObject);
 
-        // Same applies with enemies for testing purposes
-        for (int add = 0; add < allEnemyUnits.Capacity; add++)
-        {
-            addNewUnit(false, add);
+            nameSelector = GetComponent<NameSelector>();
+
+            // Get map size from the map Script and resize the array
+            //temporarily set to 2, 2
+            maxX = 30;               //********************************************************** CHANGE ME LATER *************  
+            maxY = 30;               //********************************************************** CHANGE ME LATER ************* 
+
+            // Initialize the 2D array
+            allEnemyUnits = new List<UnitClass>[maxX][];
+            for (int i = 0; i < maxX; i++)
+            {
+                allEnemyUnits[i] = new List<UnitClass>[maxY];
+            }
+        
+            generateAllEnemies();
         }
-
-        // Switch the level to test dont destroy on load
-        print("Loading level now");
-        SceneManager.LoadScene("LeonTest");
+        // Destroy duplicated gameObject created when changing scenes
+        else
+            DestroyImmediate(gameObject);
     }
 
-    // Update is called once per frame
-    void Update()
+    // Generate and adds all enemies
+    void generateAllEnemies()
     {
-        
+        for (int i = 0; i < maxX; i++)
+        {
+            for (int j = 0; j < maxY; j++)
+            {
+                // 25% chance of spawning enemy on tile
+                if (Random.Range(0.0f, 1.0f) < 0.25f)
+                    generateRandomEnemies(i, j);
+            }
+        }
+    }
+
+    // Generate random squad based on hex coordinates
+    void generateRandomEnemies(int x, int y)
+    {
+        // Calculate the number unit for this squad based on coordinates
+        //temporarily set to 4
+        int squadSize = 4;       //********************************************************** CHANGE ME LATER *************                                    
+        allEnemyUnits[x][y] = new List<UnitClass>(squadSize);
+
+        for (int i = 0; i < squadSize; i++)
+        {
+            addNewUnit(false, i, x, y);            
+        }
     }
 
     // Adds a unit when called (e.g. start new game, recruit a new member)
-    void addNewUnit(bool player, int classType)
+    void addNewUnit(bool player, int classType, int x=0, int y=0)
     {
         UnitClass newUnit = new UnitClass();
         nameSelector.getName();
@@ -61,10 +95,17 @@ public class UnitManager : MonoBehaviour
         }
         else
         {
-            allEnemyUnits.Add(newUnit);
+            setEnemyStats(ref newUnit, x, y);
+            allEnemyUnits[x][y].Add(newUnit);
             print("Added Enemy: " + newUnit.firstName + " " + newUnit.lastName);
         }
-   
+    }
+
+    // Alters the stats of enemies depending on the hex coordinates
+    void setEnemyStats(ref UnitClass unit, int x, int y)
+    {
+        unit.maxHealth += unit.maxHealth*(x+1); // temporary
+        unit.currentHealth = unit.maxHealth;
     }
 
     ///Return the squad in battle
@@ -85,9 +126,9 @@ public class UnitManager : MonoBehaviour
     // Return the proper enemy set based on map coordinates - temporarily set
     public List<UnitClass> getEnemySquad()
     {
-        List<UnitClass> unitsInBattle = new List<UnitClass>(maxPlayers);       
+        List<UnitClass> unitsInBattle = new List<UnitClass>(maxPlayers);
 
-        foreach (UnitClass unit in allEnemyUnits)
+        foreach (UnitClass unit in allEnemyUnits[enemyXCoord][enemyYCoord])
         {
             if (unit.squad == enemySet)
             {
@@ -95,6 +136,20 @@ public class UnitManager : MonoBehaviour
             }
         }
         return unitsInBattle;
+    }
+
+    // Temporary function to test battle
+    public void TestBattle()  //********************************************************** DELETE ME LATER *************                                    
+    {
+        // For testing, Simulates autopopulating the player units with
+        // starting amount of units when game is started
+        for (int add = 0; add < initialPlayerUnitCount; add++)
+        {
+            addNewUnit(true, add);
+        }
+
+        print("Entering battle!");
+        SceneManager.LoadScene("LeonTest");
     }
 }
 

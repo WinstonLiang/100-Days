@@ -22,7 +22,6 @@ public class Battle : MonoBehaviour {
     
     bool playerWon;
     bool enemyWon;    
-    int squadInBattle = 1; // Change to 0 after unitmanager is implemeneted    
 
 	// Use this for initialization
 	void Start ()

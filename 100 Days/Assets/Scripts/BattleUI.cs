@@ -5,7 +5,6 @@ using System.Collections.Generic;
 
 public class BattleUI : MonoBehaviour {
 
-    public Battle battleScript; // To grab the information of each unit to update UI (HP/Ability/etc)
     public Slider[] hpSlider; // To update the sprites of the hp bars
     public Slider[] abilitySlider; // To update the sprites of the ability bars
 
@@ -13,6 +12,7 @@ public class BattleUI : MonoBehaviour {
     public GameObject[] enemySlots; // Temporarily set to public for testing 
     public GameObject[] charUIs; // To disable the UI for nonexistent units
 
+    private Battle battleScript; // To grab the information of each unit to update UI (HP/Ability/etc)
     int playerUnitCount, enemyUnitCount; // Used to display bars only for existing units
     int maximumSlots = 4; // Set maximum slots possible (for possible future changes)
 
