@@ -5,8 +5,8 @@ using UnityEngine.UI;
 
 public class Battle : MonoBehaviour {
         
-    public bool day;
-    public bool paused;
+    public bool day;        // day or night
+    public bool paused;     
     public bool playerParticipate;
     public bool currentlyBattling;
     public float tickTime; // Length of each tick time

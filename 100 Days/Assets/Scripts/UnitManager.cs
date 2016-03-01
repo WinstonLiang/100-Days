@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
 
+[System.Serializable] 
 public class UnitManager : MonoBehaviour
 {     
     public List<UnitClass> allPlayerUnits = new List<UnitClass>(4);
     public List<UnitClass>[][] allEnemyUnits;
     public int initialPlayerUnitCount = 3;
-    public int maxPlayers = 4;    
+    public int maxPlayers = 4;    // Total number of units of a side that participates in a battle at the same time
 
-    // To be used by Battle script
-    public int battlingSquad = 0;
+    // To be used by Battle script 
+    public int battlingSquad = 0;   //********************************************************** CHANGE ALL OF US TO PRIVATE LATER ************* 
     public int enemyXCoord = 0;
     public int enemyYCoord = 0;
 
-    private NameSelector nameSelector;
-    private int enemySet = 0; // this variable should be retrieved from the Map/Game Manager elsewhere
-    private int maxX, maxY;   // Size of the map
+    NameSelector nameSelector;
+    int maxX, maxY;   // Size of the map
 
     // Hold a reference to this object to keep singleton
-    private static UnitManager unitManagerRef;
+    static UnitManager unitManagerRef;
 
     // Use this for initialization
     void Start()
@@ -37,14 +37,7 @@ public class UnitManager : MonoBehaviour
             maxX = 30;               //********************************************************** CHANGE ME LATER *************  
             maxY = 30;               //********************************************************** CHANGE ME LATER ************* 
 
-            // Initialize the 2D array
-            allEnemyUnits = new List<UnitClass>[maxX][];
-            for (int i = 0; i < maxX; i++)
-            {
-                allEnemyUnits[i] = new List<UnitClass>[maxY];
-            }
-        
-            generateAllEnemies();
+            initGameData();   // Create or load data depending on option clicked
         }
         // Destroy duplicated gameObject created when changing scenes
         else
@@ -97,7 +90,8 @@ public class UnitManager : MonoBehaviour
         {
             setEnemyStats(ref newUnit, x, y);
             allEnemyUnits[x][y].Add(newUnit);
-            print("Added Enemy: " + newUnit.firstName + " " + newUnit.lastName);
+            print("Added Enemy!");
+            //print("Added Enemy: " + newUnit.firstName + " " + newUnit.lastName);
         }
     }
 
@@ -106,6 +100,31 @@ public class UnitManager : MonoBehaviour
     {
         unit.maxHealth += unit.maxHealth*(x+1); // temporary
         unit.currentHealth = unit.maxHealth;
+    }
+
+    // Load the game data and game state, if it fails return to start menu with en error
+    void initGameData()
+    {
+        if (StartMenu.startNew)
+        {
+            // Initialize the 2D array 
+            // For testing, Simulates autopopulating the player units with
+            // starting amount of units when game is started
+            for (int add = 0; add < initialPlayerUnitCount; add++) //********************************************************** CHANGE ME LATER *************    
+            {
+                addNewUnit(true, add);
+            }
+
+            allEnemyUnits = new List<UnitClass>[maxX][];
+            for (int i = 0; i < maxX; i++)
+            {
+                allEnemyUnits[i] = new List<UnitClass>[maxY];
+            }
+
+            generateAllEnemies();
+        }
+        else
+            GameStateManager.loadGameData();        
     }
 
     ///Return the squad in battle
@@ -128,26 +147,22 @@ public class UnitManager : MonoBehaviour
     {
         List<UnitClass> unitsInBattle = new List<UnitClass>(maxPlayers);
 
-        foreach (UnitClass unit in allEnemyUnits[enemyXCoord][enemyYCoord])
+        if (allEnemyUnits[enemyXCoord][enemyYCoord] == null)//********************************************************** FIX ME LATER ************* 
+            print("No enemies here!");
+        else
         {
-            if (unit.squad == enemySet)
+            foreach (UnitClass unit in allEnemyUnits[enemyXCoord][enemyYCoord])
             {
                 unitsInBattle.Add(unit);
             }
         }
+
         return unitsInBattle;
     }
 
     // Temporary function to test battle
     public void TestBattle()  //********************************************************** DELETE ME LATER *************                                    
     {
-        // For testing, Simulates autopopulating the player units with
-        // starting amount of units when game is started
-        for (int add = 0; add < initialPlayerUnitCount; add++)
-        {
-            addNewUnit(true, add);
-        }
-
         print("Entering battle!");
         SceneManager.LoadScene("LeonTest");
     }
