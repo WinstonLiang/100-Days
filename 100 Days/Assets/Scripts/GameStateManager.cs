@@ -27,6 +27,9 @@ public class GameStateManager : MonoBehaviour
         FileStream file = File.Create(Application.persistentDataPath + "/gamesave.dat");
         bf.Serialize(file, allUnits);
         file.Close();
+
+        // Set PlayerPrefs saved flag to enable continue button on start menu
+        PlayerPrefs.SetInt("saves", 1);
         print("Saved data.");
     }
 
@@ -46,6 +49,9 @@ public class GameStateManager : MonoBehaviour
             print("Savefile found, loading...");
         }
         else
-            print("No savefile found.");       
+        {
+            print("No savefile found.");
+            SceneManager.LoadScene("StartMenu");
+        }            
     }
 }
