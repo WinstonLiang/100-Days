@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Battle : MonoBehaviour {
         
@@ -9,6 +10,7 @@ public class Battle : MonoBehaviour {
     public bool paused;     
     public bool playerParticipate;
     public bool currentlyBattling;
+    public int battleEndWaittime;
     public float tickTime; // Length of each tick time
     public List<UnitClass> playerUnits; // A list of playerUnits grabbed from unitManager
     public List<UnitClass> enemyUnits; // A list of enemyUnits grabbed from enemyManager
@@ -55,6 +57,7 @@ public class Battle : MonoBehaviour {
         else
         {
             currentlyBattling = false;
+            StartCoroutine(finishedBattle());
         }
 	}
        
@@ -276,5 +279,11 @@ public class Battle : MonoBehaviour {
              currentlyBattling = false;
              print("Battle is over!!");
          }
+    }
+
+    IEnumerator finishedBattle()
+    {
+        yield return new WaitForSeconds(battleEndWaittime);
+        SceneManager.LoadScene("MapNode");
     }
 }

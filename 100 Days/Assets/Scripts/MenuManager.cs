@@ -11,12 +11,39 @@ public class MenuManager : MonoBehaviour {
 
     private List<UnitClass> allPlayerUnits;
     private Transform parentPanel;
-    private bool renderedArmyData;
+
+    private AssaultClass assaultScript;
+    private DefenderClass defenderScript;
+    private MedicClass medicScript;
 
     void Start()
     {
         parentPanel = GameObject.Find("Panel Units").GetComponent<RectTransform>();
-        renderedArmyData = false;
+        assaultScript = GameObject.Find("AssaultGO").GetComponent<AssaultClass>();
+        defenderScript = GameObject.Find("DefenderGO").GetComponent<DefenderClass>();
+        medicScript = GameObject.Find("MedicGO").GetComponent<MedicClass>();
+    }
+
+    // Set the sprite depending on the class type
+    void changeSprite(Image image, int classType)
+    {
+        if (classType == 0)
+        {
+            // Set Apprentice/Infantry sprite here
+            image.sprite = medicScript.idleSprite;
+        }
+        else if (classType == 1)
+        {
+            image.sprite = assaultScript.idleSprite;
+        }
+        else if (classType == 2)
+        {
+            image.sprite = defenderScript.idleSprite;
+        }
+        else if (classType == 3)
+        {
+            image.sprite = medicScript.idleSprite;
+        }
     }
 
     public void ShowMenu(Menu menu)
@@ -39,12 +66,22 @@ public class MenuManager : MonoBehaviour {
         }
     }
 
-    void renderData(string name)
+    public void clearRenderedData()
     {
-        if(name == "Army Panel" && !renderedArmyData)
+        for (int i = 0; i < parentPanel.childCount; i++)
+        {
+            Destroy(parentPanel.GetChild(i).gameObject);
+        }
+        print("Destroyed previous rendered data");
+    }
+
+    public void renderData(string name)
+    {
+        if(name == "Army Panel")
         {
             print("Render Army panel data!!");
             allPlayerUnits = GameObject.Find("UnitsData").GetComponent<UnitManager>().allPlayerUnits;
+            clearRenderedData();
 
             foreach (UnitClass unit in allPlayerUnits)
             {
@@ -62,8 +99,10 @@ public class MenuManager : MonoBehaviour {
                 {
                     textParent.GetChild(i).GetComponent<Text>().text = unitInfo[i];
                 }
+
+                // Set the correct image for the sprite
+                changeSprite(textParent.GetChild(0).GetChild(0).GetComponent<Image>(), unit.classType);
             }
-            renderedArmyData = true;
         }
     }
 }
