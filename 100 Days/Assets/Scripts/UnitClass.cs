@@ -82,4 +82,20 @@ public class UnitClass
         firstName = first;
         lastName = last;
     }
+
+    public string classToString()
+    {
+        if (classType == 1)
+        {
+            return "Assault";
+        }
+        else if (classType == 2)
+        {
+            return "Defender";
+        }
+        else // Add more if statements for more classes (classType == 3)
+        {
+            return "Medic";
+        }
+    }
 }
