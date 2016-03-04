@@ -94,7 +94,7 @@ public class Battle : MonoBehaviour {
                 // Do ability attack here **********************************
                 print(unit.firstName + " uses ability!");
                 unit.currentPower = unit.maxPower;
-                unit.getClassScript(unit.classType).ability1(enemyUnits, getRandomEnemy(), true);
+                unit.getClassScript().ability1(enemyUnits, getRandomEnemy(), true);
             }
         }
     }
@@ -131,7 +131,7 @@ public class Battle : MonoBehaviour {
             {
                 // Do ability attack here **********************************
                 unit.currentPower = unit.maxPower;
-                unit.getClassScript(unit.classType).ability1(playerUnits, getRandomPlayer(), true);
+                unit.getClassScript().ability1(playerUnits, getRandomPlayer(), true);
             }
         }
     }
@@ -160,9 +160,9 @@ public class Battle : MonoBehaviour {
         foreach (UnitClass targetUnit in allUnits)
         {
             if (!targetUnit.deadFlag && targetUnit != allUnits[randomTarget] && !activated && 
-                targetUnit.getClassScript(targetUnit.classType).returnReceiveDmgModify())
+                targetUnit.getClassScript().returnReceiveDmgModify())
             {
-                targetUnit.getClassScript(targetUnit.classType).receiveDmgAbility1(allUnits, targetUnit, ref randomTarget, ref activated);
+                targetUnit.getClassScript().receiveDmgAbility1(allUnits, targetUnit, ref randomTarget, ref activated);
             }
         }
 
@@ -249,7 +249,7 @@ public class Battle : MonoBehaviour {
                     unitP.currentPower -= 1;
 
                     // Decrement the tick for class
-                    unitP.getClassScript(unitP.classType).classTick(unitP);
+                    unitP.getClassScript().classTick(unitP);
                 }
             }
 
@@ -264,7 +264,7 @@ public class Battle : MonoBehaviour {
                     unitE.currentPower -= 1;
 
                     // Decrement the tick for class
-                    unitE.getClassScript(unitE.classType).classTick(unitE);
+                    unitE.getClassScript().classTick(unitE);
                 }
             }
             battleUI.updateBattleUI();

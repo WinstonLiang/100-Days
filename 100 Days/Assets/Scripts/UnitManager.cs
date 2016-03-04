@@ -79,7 +79,7 @@ public class UnitManager : MonoBehaviour
         nameSelector.getName();
         newUnit.changeName(nameSelector.firstName, nameSelector.lastName);
         newUnit.classType = classType;
-        newUnit.classChange(newUnit);
+        newUnit.classChange();
 
         if(player)
         {

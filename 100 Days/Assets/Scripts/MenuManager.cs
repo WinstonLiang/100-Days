@@ -11,6 +11,8 @@ public class MenuManager : MonoBehaviour {
 
     private List<UnitClass> allPlayerUnits;
     private Transform parentPanel;
+    private Menu unitPanel;
+    private UnitPanelRender unitRenderScript;
 
     private AssaultClass assaultScript;
     private DefenderClass defenderScript;
@@ -19,6 +21,8 @@ public class MenuManager : MonoBehaviour {
     void Start()
     {
         parentPanel = GameObject.Find("Panel Units").GetComponent<RectTransform>();
+        unitPanel = GameObject.Find("Unit Panel").GetComponent<Menu>();
+        unitRenderScript = GameObject.Find("Unit Panel").GetComponent<UnitPanelRender>();
         assaultScript = GameObject.Find("AssaultGO").GetComponent<AssaultClass>();
         defenderScript = GameObject.Find("DefenderGO").GetComponent<DefenderClass>();
         medicScript = GameObject.Find("MedicGO").GetComponent<MedicClass>();
@@ -57,6 +61,18 @@ public class MenuManager : MonoBehaviour {
         currentMenu.IsOpen = true;
     }
 
+    // Overload the ShowMenu function to use for unit panel
+    public void ShowMenu(Menu menu, int unitIndex)
+    {
+        if (currentMenu != null)
+            currentMenu.IsOpen = false;
+
+        unitRenderScript.renderUnitData(allPlayerUnits[unitIndex]);
+
+        currentMenu = menu;
+        currentMenu.IsOpen = true;
+    }
+
     public void ShowMap()
     {
         if (currentMenu != null)
@@ -77,11 +93,12 @@ public class MenuManager : MonoBehaviour {
 
     public void renderData(string name)
     {
-        if(name == "Army Panel")
+        if (name == "Army Panel")
         {
             print("Render Army panel data!!");
             allPlayerUnits = GameObject.Find("UnitsData").GetComponent<UnitManager>().allPlayerUnits;
             clearRenderedData();
+            int unitIndex = 0;
 
             foreach (UnitClass unit in allPlayerUnits)
             {
@@ -93,6 +110,7 @@ public class MenuManager : MonoBehaviour {
                     unit.currentHealth.ToString() + "/" + unit.maxHealth.ToString() };
 
                 // Traverse through it's child Text objects and set the data accordingly
+                // textParent is the button for the unit
                 Transform textParent = unitClone.transform.GetChild(0);
                 int textObjects = textParent.childCount;
                 for (int i = 0; i < textObjects; i++)
@@ -102,7 +120,20 @@ public class MenuManager : MonoBehaviour {
 
                 // Set the correct image for the sprite
                 changeSprite(textParent.GetChild(0).GetChild(0).GetComponent<Image>(), unit.classType);
+
+                // Set the listener event for the button to transition to unit screen              
+                int _unitIndex = unitIndex++;
+                textParent.GetComponent<Button>().onClick.AddListener(() => ShowMenu(unitPanel, _unitIndex));                
             }
+        }
+        else if (name == "Squad Panel")
+        {
+            // How to arrange squad menu / allocate units to squads?
+            print("Showing Squad panel");
+        }
+        else if (name == "R&D Panel")
+        {
+
         }
     }
 }

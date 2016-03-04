@@ -8,17 +8,6 @@ public class AssaultClass : Classes {
                totalAbilities;
     public bool human, receiveDmgModify; // Flag whether class has skills that modify dmg received by team     
 
-	// Use this for initialization
-	void Start () 
-    {        
-	}
-	
-	// Update is called once per frame
-	void Update ()
-    {
-	    
-	}
-
     public override void classChange(UnitClass unit)
     {
         unit.maxHealth = maxHealth;

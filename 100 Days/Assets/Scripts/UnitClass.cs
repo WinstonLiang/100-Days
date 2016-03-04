@@ -26,7 +26,7 @@ public class UnitClass
         level = 1;
         currentHealth = 100;
         maxHealth = 100;
-        att = 30; // temporarily set from 5 to 30 for testing
+        att = 10;
         def = 5;
         currentSpeed = 10;
         maxSpeed = 10;
@@ -47,14 +47,14 @@ public class UnitClass
     }
 
     // Change the class of the unit
-    public void classChange(UnitClass unit)
+    public void classChange()
     {
-        Classes classScript = getClassScript(unit.classType);
-        classScript.classChange(unit);
+        Classes classScript = getClassScript();
+        classScript.classChange(this);
     }
 
     // Retrieves the reference to it's own class script
-    public Classes getClassScript(int classType)
+    public Classes getClassScript()
     {
         if (classType == 1)
         {
@@ -70,7 +70,7 @@ public class UnitClass
         }
     }
 
-    // Change the stats of the unit
+    // Change the stats of the unit (Useless function?)
     public void changeStat(int statChange, int orginalStat)
     {
         orginalStat = orginalStat - statChange;
