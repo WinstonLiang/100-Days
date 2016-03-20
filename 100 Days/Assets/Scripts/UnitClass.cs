@@ -18,8 +18,6 @@ public class UnitClass
     public int ablity;
     public int healingCounter;
 
-    private int gender;
-
     // Constructor
     public UnitClass()
     {

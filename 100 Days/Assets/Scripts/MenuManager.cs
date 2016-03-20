@@ -9,14 +9,14 @@ public class MenuManager : MonoBehaviour {
     public Menu currentMenu;
     public GameObject panelUnit;
 
-    private List<UnitClass> allPlayerUnits;
-    private Transform parentPanel;
-    private Menu unitPanel;
-    private UnitPanelRender unitRenderScript;
+    List<UnitClass> allPlayerUnits;
+    Transform parentPanel;
+    Menu unitPanel;
+    UnitPanelRender unitRenderScript;
 
-    private AssaultClass assaultScript;
-    private DefenderClass defenderScript;
-    private MedicClass medicScript;
+    AssaultClass assaultScript;
+    DefenderClass defenderScript;
+    MedicClass medicScript;
 
     void Start()
     {
