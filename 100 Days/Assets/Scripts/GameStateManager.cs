@@ -54,4 +54,9 @@ public class GameStateManager : MonoBehaviour
             SceneManager.LoadScene("StartMenu");
         }            
     }
+
+    public void QuitToMenu()
+    {
+        SceneManager.LoadScene("StartMenu");
+    }
 }

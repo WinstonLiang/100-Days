@@ -82,6 +82,16 @@ public class MenuManager : MonoBehaviour {
         }
     }
 
+    public void OpenOptions(Menu menu)
+    {
+        menu.IsOpen = !menu.IsOpen;
+    }
+
+    public void CloseOptions(Menu menu)
+    {
+        menu.IsOpen = false;
+    }
+
     public void clearRenderedData()
     {
         for (int i = 0; i < parentPanel.childCount; i++)
