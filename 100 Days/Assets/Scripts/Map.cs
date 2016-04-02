@@ -33,9 +33,8 @@ public class Map : MonoBehaviour
 
      }
 
-     // Update is called once per frame
-     void Update()
+     public void addTile(int x, int y)
      {
-
+          Vector3 pos = new Vector3(x + originX, -(y + originY) + (x % 2) * .5f, 0);
      }
 }

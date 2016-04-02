@@ -16,13 +16,14 @@ public class tile
 
 public class MapGenerator : MonoBehaviour {
 
-     public Dictionary<Vector3,tile> generatedMap;
+     private Dictionary<Vector3,tile> generatedMap;
      public int biomeSize;
-     public NameSelector nameSelector;
+     //public NameSelector nameSelector;
      public GameObject maptile;
      public GameObject maptile2;
 
 	// Use this for initialization
+     /*
 	void Start () {
           Random.seed = (int)System.DateTime.Now.Ticks;
           generatedMap = new Dictionary<Vector3,tile>();
@@ -34,7 +35,7 @@ public class MapGenerator : MonoBehaviour {
                     if (Random.Range(0, 1f) < 0.25)
                     {
                          newTile.battle = true;
-                         /*
+                         //
                          for (int add = 0; add < newTile.tileEnemies.Capacity; add++)
                          {
                               
@@ -50,7 +51,7 @@ public class MapGenerator : MonoBehaviour {
                               print("Added Enemy: " + newTile.tileEnemies[add].firstName + " " + newTile.tileEnemies[add].lastName);
                                
                          }
-                          */
+                          //
                     }
                     generatedMap.Add(newTile.tilePosition, newTile);
                }
@@ -62,4 +63,31 @@ public class MapGenerator : MonoBehaviour {
                     Instantiate(maptile, T.Value.tilePosition, Quaternion.identity);
           }
 	}
+      */
+
+     public void begin()
+     {
+          generatedMap = new Dictionary<Vector3, tile>();
+          Debug.Log(";3;");
+     }
+
+     public void instantiateTiles()
+     {
+          foreach (KeyValuePair<Vector3, tile> T in generatedMap)
+          {
+               if (T.Value.battle)
+                    Instantiate(maptile2, T.Value.tilePosition, Quaternion.identity);
+               else
+                    Instantiate(maptile, T.Value.tilePosition, Quaternion.identity);
+          }
+     }
+
+     public void addTile(int x, int y, bool enemy)
+     {
+          tile newTile = new tile();
+          newTile.tilePosition = new Vector3(x * 1.05f, (-y + (x % 2) * .5f) * 1.12f, 0);
+          newTile.battle = enemy;
+          generatedMap.Add(newTile.tilePosition, newTile);
+     }
+
 }
