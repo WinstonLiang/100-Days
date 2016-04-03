@@ -89,8 +89,8 @@ public class MenuManager : MonoBehaviour {
 
     public void CloseOptions(Menu menu)
     {
-        print(menu.name);
-        menu.IsOpen = false;
+        if (menu.IsOpen)
+            menu.IsOpen = false;
     }
 
     public void clearRenderedData()

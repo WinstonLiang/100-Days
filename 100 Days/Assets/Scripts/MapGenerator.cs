@@ -17,6 +17,8 @@ public class tile
 public class MapGenerator : MonoBehaviour {
 
      private Dictionary<Vector3,tile> generatedMap;
+     private Transform nodeParent;
+
      public int biomeSize;
      //public NameSelector nameSelector;
      public GameObject maptile;
@@ -73,12 +75,21 @@ public class MapGenerator : MonoBehaviour {
 
      public void instantiateTiles()
      {
+         //get nodeParent transform
+         nodeParent = GameObject.Find("DragParent").transform;
+
           foreach (KeyValuePair<Vector3, tile> T in generatedMap)
           {
+              //declare the instantiated object
+              GameObject newTile;
+
                if (T.Value.battle)
-                    Instantiate(maptile2, T.Value.tilePosition, Quaternion.identity);
+                    newTile = (GameObject)Instantiate(maptile2, T.Value.tilePosition, Quaternion.identity);
                else
-                    Instantiate(maptile, T.Value.tilePosition, Quaternion.identity);
+                    newTile = (GameObject)Instantiate(maptile, T.Value.tilePosition, Quaternion.identity);
+
+              //set the instantiated tile's parent to nodeParent
+               newTile.transform.SetParent(nodeParent);
           }
      }
 

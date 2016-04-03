@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 
 public class CameraMapScript : MonoBehaviour {
@@ -14,6 +15,8 @@ public class CameraMapScript : MonoBehaviour {
      private float mousePosX;
      private float mousePosY;
 
+     public float dragFactor = 1.0f;
+
 	void Update () {
           mousePosX = Input.mousePosition.x;
           mousePosY = Input.mousePosition.y;
@@ -26,4 +29,14 @@ public class CameraMapScript : MonoBehaviour {
           else if (mousePosY > Screen.height - triggerMove && transform.position.y < max_y)
                transform.position += new Vector3(0, moveIncrement, 0);
 	}
+
+    public void OnDrag(BaseEventData data)
+    {
+        PointerEventData pointerData = data as PointerEventData;
+
+        if (pointerData.button.ToString() == "Right")
+        {
+            transform.position = transform.position + new Vector3(pointerData.delta.x * dragFactor * 0.01f, pointerData.delta.y * dragFactor * 0.01f, 0);
+        }
+    }
 }
