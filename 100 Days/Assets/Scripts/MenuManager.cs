@@ -54,7 +54,7 @@ public class MenuManager : MonoBehaviour {
     {
         if (currentMenu != null)
             currentMenu.IsOpen = false;
-
+        print("asdflkjs");
         renderData(menu.name);
 
         currentMenu = menu;
@@ -89,6 +89,7 @@ public class MenuManager : MonoBehaviour {
 
     public void CloseOptions(Menu menu)
     {
+        print(menu.name);
         menu.IsOpen = false;
     }
 
