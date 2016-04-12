@@ -14,6 +14,13 @@ public class MenuManager : MonoBehaviour {
     Menu unitPanel;
     UnitPanelRender unitRenderScript;
 
+    Transform renamePanel; // To use with renaming
+    UnitClass currentUnit;
+
+    Transform skillPanel; // To use with R&D
+    RDManager rDManager;
+    bool rDLoaded;
+
     AssaultClass assaultScript;
     DefenderClass defenderScript;
     MedicClass medicScript;
@@ -23,9 +30,16 @@ public class MenuManager : MonoBehaviour {
         parentPanel = GameObject.Find("Panel Units").GetComponent<RectTransform>();
         unitPanel = GameObject.Find("Unit Panel").GetComponent<Menu>();
         unitRenderScript = GameObject.Find("Unit Panel").GetComponent<UnitPanelRender>();
+        renamePanel = GameObject.Find("Rename Panel").transform;
+        CloseRenamePanel();
+        skillPanel = GameObject.Find("Skill Panels").transform;
         assaultScript = GameObject.Find("AssaultGO").GetComponent<AssaultClass>();
         defenderScript = GameObject.Find("DefenderGO").GetComponent<DefenderClass>();
         medicScript = GameObject.Find("MedicGO").GetComponent<MedicClass>();
+
+        //Set up R&D buttons/text when scene is loaded
+        rDManager = GameObject.Find("UnitsData").GetComponent<RDManager>();
+        renderData("R&D Panel");
     }
 
     // Set the sprite depending on the class type
@@ -54,7 +68,7 @@ public class MenuManager : MonoBehaviour {
     {
         if (currentMenu != null)
             currentMenu.IsOpen = false;
-        print("asdflkjs");
+
         renderData(menu.name);
 
         currentMenu = menu;
@@ -68,6 +82,7 @@ public class MenuManager : MonoBehaviour {
             currentMenu.IsOpen = false;
 
         unitRenderScript.renderUnitData(allPlayerUnits[unitIndex]);
+        currentUnit = allPlayerUnits[unitIndex];
 
         currentMenu = menu;
         currentMenu.IsOpen = true;
@@ -80,6 +95,31 @@ public class MenuManager : MonoBehaviour {
             currentMenu.IsOpen = false;
             currentMenu = null;
         }
+    }
+
+    //Attached to rename button
+    public void RenamePanel()
+    {
+        renamePanel.gameObject.SetActive(true);
+    }
+
+    //Submit the new unit name
+    public void SubmitRename(InputField newName)
+    {
+        if (newName.text.Trim() != "")
+        {
+            currentUnit.lastName = "";
+            currentUnit.firstName = newName.text;
+            unitRenderScript.renderUnitData(currentUnit);
+            newName.text = "";
+        }
+        CloseRenamePanel();
+    }
+
+    //Close the rename panel
+    public void CloseRenamePanel()
+    {
+        renamePanel.gameObject.SetActive(false);
     }
 
     public void OpenOptions(Menu menu)
@@ -144,7 +184,21 @@ public class MenuManager : MonoBehaviour {
         }
         else if (name == "R&D Panel")
         {
+            if (!rDLoaded)
+            {
+                //Iterate through each panel under Skill Panels
+                rDManager.checkMaxLevels();
+                int skillPanels = skillPanel.childCount;
+                for (int i = 0; i < skillPanels; i++)
+                {
+                    SkillTree currentSkilltree = rDManager.skillTrees[i];
+                    rDManager.SetLockedSkill(currentSkilltree.ability1Lock, skillPanel.GetChild(i).GetChild(2));
+                    rDManager.SetLockedSkill(currentSkilltree.ability2Lock, skillPanel.GetChild(i).GetChild(3));
+                    rDManager.SetLockedSkill(currentSkilltree.ability3Lock, skillPanel.GetChild(i).GetChild(4));
+                }
 
+                rDLoaded = true;
+            }          
         }
     }
 }
