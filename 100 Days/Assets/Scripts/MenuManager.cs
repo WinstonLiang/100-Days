@@ -8,11 +8,16 @@ public class MenuManager : MonoBehaviour {
 
     public Menu currentMenu;
     public GameObject panelUnit;
+    public GameObject dragUnit;
+    public Sprite transparentSprite;
 
     List<UnitClass> allPlayerUnits;
     Transform parentPanel;
     Menu unitPanel;
     UnitPanelRender unitRenderScript;
+
+    Transform battlePanel; // To use with Squad panel
+    UnitManager unitManager;    
 
     Transform renamePanel; // To use with renaming
     UnitClass currentUnit;
@@ -30,6 +35,8 @@ public class MenuManager : MonoBehaviour {
         parentPanel = GameObject.Find("Panel Units").GetComponent<RectTransform>();
         unitPanel = GameObject.Find("Unit Panel").GetComponent<Menu>();
         unitRenderScript = GameObject.Find("Unit Panel").GetComponent<UnitPanelRender>();
+        battlePanel = GameObject.Find("Battle Panel").transform;
+        unitManager = GameObject.Find("UnitsData").GetComponent<UnitManager>();
         renamePanel = GameObject.Find("Rename Panel").transform;
         CloseRenamePanel();
         skillPanel = GameObject.Find("Skill Panels").transform;
@@ -61,6 +68,10 @@ public class MenuManager : MonoBehaviour {
         else if (classType == 3)
         {
             image.sprite = medicScript.idleSprite;
+        }
+        else if (classType == -1)
+        {
+            image.sprite = transparentSprite;
         }
     }
 
@@ -179,8 +190,27 @@ public class MenuManager : MonoBehaviour {
         }
         else if (name == "Squad Panel")
         {
-            // How to arrange squad menu / allocate units to squads?
-            print("Showing Squad panel");
+            //Initialize the battle members
+            List<UnitClass> playerUnits = unitManager.getBattlingSquad();
+            int battlePanelCount = battlePanel.childCount;
+            for (int i = 0; i < battlePanelCount; i++)
+            {
+                //Check against max size of playerUnits
+                if (playerUnits.Count > i)
+                {
+                    changeSprite(battlePanel.GetChild(i).GetChild(0).GetChild(0).GetComponent<Image>(), playerUnits[i].classType);
+                    battlePanel.GetChild(i).GetChild(1).GetComponent<Text>().text = playerUnits[i].firstName + " " + playerUnits[i].lastName;
+                }
+                else
+                {
+                    changeSprite(battlePanel.GetChild(i).GetChild(0).GetChild(0).GetComponent<Image>(), -1);
+                    battlePanel.GetChild(i).GetChild(1).GetComponent<Text>().text = "";
+                }
+            }
+
+            //Initialize the reserves list
+
+
         }
         else if (name == "R&D Panel")
         {

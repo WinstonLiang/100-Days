@@ -11,7 +11,7 @@ public class UnitManager : MonoBehaviour
     public int maxPlayers = 4;    // Total number of units of a side that participates in a battle at the same time
 
     // To be used by Battle script 
-    public int battlingSquad = 0;   //********************************************************** CHANGE ALL OF US TO PRIVATE LATER ************* 
+    public int battlingSquad = 0;   // 0 is the active battling squad - 1 are the reserves
     public int enemyXCoord = 0;
     public int enemyYCoord = 0;
 
@@ -76,12 +76,12 @@ public class UnitManager : MonoBehaviour
 
         for (int i = 0; i < squadSize; i++)
         {
-            addNewUnit(false, i, x, y);            
+            addNewUnit(false, i, 0, x, y);            
         }
     }
 
     // Adds a unit when called (e.g. start new game, recruit a new member)
-    void addNewUnit(bool player, int classType, int x=0, int y=0)
+    void addNewUnit(bool player, int classType, int battleSquad=1, int x=0, int y=0)
     {
         UnitClass newUnit = new UnitClass();
         nameSelector.getName();
@@ -121,7 +121,7 @@ public class UnitManager : MonoBehaviour
             // starting amount of units when game is started
             for (int add = 0; add < initialPlayerUnitCount; add++) //********************************************************** CHANGE ME LATER *************    
             {
-                addNewUnit(true, add);
+                addNewUnit(true, add, 0);
             }
 
             allEnemyUnits = new List<UnitClass>[maxX][];
