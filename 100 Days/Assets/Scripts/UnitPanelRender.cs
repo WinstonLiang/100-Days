@@ -19,6 +19,6 @@ public class UnitPanelRender : MonoBehaviour
         speedTxt.text = unit.maxSpeed.ToString();
         critTxt.text = unit.crit.ToString();
         dodgeTxt.text = unit.dodge.ToString();
-        squadTxt.text = unit.squad.ToString();
+        squadTxt.text = unit.squad == 0 ? "Active" : "Reserve";
     }
 }

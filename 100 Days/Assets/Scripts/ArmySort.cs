@@ -42,7 +42,7 @@ public class ArmySort : MonoBehaviour
         levelDesc = !levelDesc;
         menuManagerScript.clearRenderedData();
         menuManagerScript.renderData("Army Panel");
-        print("Sorted by level");
+        if (UnitManager.DEBUG) print("Sorted by level");
     }
 
     public void SortName()
@@ -65,7 +65,7 @@ public class ArmySort : MonoBehaviour
         nameDesc = !nameDesc;
         menuManagerScript.clearRenderedData();
         menuManagerScript.renderData("Army Panel");
-        print("Sorted by name");
+        if (UnitManager.DEBUG) print("Sorted by name");
     }
 
     public void SortClass()
@@ -88,7 +88,7 @@ public class ArmySort : MonoBehaviour
         classDesc = !classDesc;
         menuManagerScript.clearRenderedData();
         menuManagerScript.renderData("Army Panel");
-        print("Sorted by class");
+        if (UnitManager.DEBUG) print("Sorted by class");
     }
 
     public void SortHealth()
@@ -111,7 +111,7 @@ public class ArmySort : MonoBehaviour
         healthDesc = !healthDesc;
         menuManagerScript.clearRenderedData();
         menuManagerScript.renderData("Army Panel");
-        print("Sorted by remaining health");
+        if (UnitManager.DEBUG) print("Sorted by remaining health");
     }
 
     // Set other sort buttons images to transparent

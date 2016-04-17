@@ -9,6 +9,7 @@ public class UnitManager : MonoBehaviour
     public List<UnitClass>[][] allEnemyUnits;
     public int initialPlayerUnitCount = 3;
     public int maxPlayers = 4;    // Total number of units of a side that participates in a battle at the same time
+    public static bool DEBUG = false;
 
     // To be used by Battle script 
     public int battlingSquad = 0;   // 0 is the active battling squad - 1 are the reserves
@@ -150,6 +151,30 @@ public class UnitManager : MonoBehaviour
             }
         }
         return unitsInBattle;
+    }
+
+    /// <summary>
+    /// Returns the number of units in battle squad.
+    /// </summary>
+    /// <returns></returns>
+    public int GetBattleSquadCount()
+    {
+        return getBattlingSquad().Count;
+    }
+
+    ///Return the reserves
+    public List<UnitClass> getReserves()
+    {
+        List<UnitClass> unitsInReserve = new List<UnitClass>();
+
+        foreach (UnitClass unit in allPlayerUnits)
+        {
+            if (unit.squad != battlingSquad)
+            {
+                unitsInReserve.Add(unit);
+            }
+        }
+        return unitsInReserve;
     }
 
     // Return the proper enemy set based on map coordinates - temporarily set

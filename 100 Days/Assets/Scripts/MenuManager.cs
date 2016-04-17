@@ -1,11 +1,13 @@
 ﻿using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour {
-
+    public GameObject testvar;
     public Menu currentMenu;
     public GameObject panelUnit;
     public GameObject dragUnit;
@@ -17,6 +19,8 @@ public class MenuManager : MonoBehaviour {
     UnitPanelRender unitRenderScript;
 
     Transform battlePanel; // To use with Squad panel
+    Transform parentDragPanel;
+    DragScript dragScript;
     UnitManager unitManager;    
 
     Transform renamePanel; // To use with renaming
@@ -36,6 +40,8 @@ public class MenuManager : MonoBehaviour {
         unitPanel = GameObject.Find("Unit Panel").GetComponent<Menu>();
         unitRenderScript = GameObject.Find("Unit Panel").GetComponent<UnitPanelRender>();
         battlePanel = GameObject.Find("Battle Panel").transform;
+        dragScript = battlePanel.GetComponent<DragScript>();
+        parentDragPanel = GameObject.Find("Panel DragUnits").transform;
         unitManager = GameObject.Find("UnitsData").GetComponent<UnitManager>();
         renamePanel = GameObject.Find("Rename Panel").transform;
         CloseRenamePanel();
@@ -150,14 +156,24 @@ public class MenuManager : MonoBehaviour {
         {
             Destroy(parentPanel.GetChild(i).gameObject);
         }
-        print("Destroyed previous rendered data");
+        if (UnitManager.DEBUG) print("Destroyed previous rendered data");
+    }
+
+    public void clearRenderedDragData()
+    {
+        for (int i = 0; i < parentDragPanel.childCount; i++)
+        {
+            Destroy(parentDragPanel.GetChild(i).gameObject);
+        }
+        if (UnitManager.DEBUG) print("Destroyed previous rendered drag panel data");
     }
 
     public void renderData(string name)
     {
         if (name == "Army Panel")
         {
-            print("Render Army panel data!!");
+            #region Army Panel
+            if (UnitManager.DEBUG) print("Render Army panel data!!");
             allPlayerUnits = GameObject.Find("UnitsData").GetComponent<UnitManager>().allPlayerUnits;
             clearRenderedData();
             int unitIndex = 0;
@@ -185,11 +201,13 @@ public class MenuManager : MonoBehaviour {
 
                 // Set the listener event for the button to transition to unit screen              
                 int _unitIndex = unitIndex++;
-                textParent.GetComponent<Button>().onClick.AddListener(() => ShowMenu(unitPanel, _unitIndex));                
+                textParent.GetComponent<Button>().onClick.AddListener(() => ShowMenu(unitPanel, _unitIndex));
             }
+            #endregion
         }
         else if (name == "Squad Panel")
         {
+            #region Squad Panel
             //Initialize the battle members
             List<UnitClass> playerUnits = unitManager.getBattlingSquad();
             int battlePanelCount = battlePanel.childCount;
@@ -198,22 +216,73 @@ public class MenuManager : MonoBehaviour {
                 //Check against max size of playerUnits
                 if (playerUnits.Count > i)
                 {
-                    changeSprite(battlePanel.GetChild(i).GetChild(0).GetChild(0).GetComponent<Image>(), playerUnits[i].classType);
-                    battlePanel.GetChild(i).GetChild(1).GetComponent<Text>().text = playerUnits[i].firstName + " " + playerUnits[i].lastName;
+                    testvar = battlePanel.GetChild(i).GetChild(1).gameObject;
+                    changeSprite(battlePanel.GetChild(i).GetChild(1).GetChild(0).GetComponent<Image>(), playerUnits[i].classType);
+                    battlePanel.GetChild(i).GetChild(0).GetComponent<Text>().text = playerUnits[i].firstName + " " + playerUnits[i].lastName;
                 }
                 else
                 {
-                    changeSprite(battlePanel.GetChild(i).GetChild(0).GetChild(0).GetComponent<Image>(), -1);
-                    battlePanel.GetChild(i).GetChild(1).GetComponent<Text>().text = "";
+                    changeSprite(battlePanel.GetChild(i).GetChild(1).GetChild(0).GetComponent<Image>(), -1);
+                    battlePanel.GetChild(i).GetChild(0).GetComponent<Text>().text = "";
                 }
             }
 
             //Initialize the reserves list
+            clearRenderedDragData();
+            foreach (UnitClass unit in allPlayerUnits)
+            {
+                if (unit.squad == 1) // 1 = reserve squad
+                {
+                    GameObject unitClone = Instantiate(dragUnit);
+                    unitClone.transform.SetParent(parentDragPanel, false);
 
+                    #region Add event triggers
+                    EventTrigger trigger = unitClone.GetComponent<EventTrigger>();
+                    
+                    //Drag
+                    EventTrigger.Entry entry = new EventTrigger.Entry();
+                    entry.eventID = EventTriggerType.Drag;
+                    entry.callback = new EventTrigger.TriggerEvent();
+                    entry.callback.AddListener((eventData) => { dragScript.OnDragBattleMember(eventData); });
+                    trigger.triggers.Add(entry);
 
+                    //Pointer click
+                    EventTrigger.Entry entry2 = new EventTrigger.Entry();
+                    entry2.eventID = EventTriggerType.PointerDown;
+                    entry2.callback = new EventTrigger.TriggerEvent();
+                    entry2.callback.AddListener((eventData) => { dragScript.OnMemberClicked(eventData); });
+                    trigger.triggers.Add(entry2);
+
+                    //End drag
+                    EventTrigger.Entry entry3 = new EventTrigger.Entry();
+                    entry3.eventID = EventTriggerType.EndDrag;
+                    entry3.callback = new EventTrigger.TriggerEvent();
+                    entry3.callback.AddListener((eventData) => { dragScript.OnDragEndBattleMember(eventData); });
+                    trigger.triggers.Add(entry3);
+                    #endregion
+
+                    // Set up an array to be used with setting the Text objects
+                    string[] unitInfo = { unit.level.ToString(), unit.firstName, unit.classToString(), 
+                    unit.currentHealth.ToString() + "/" + unit.maxHealth.ToString() };
+
+                    // Traverse through it's child Text objects and set the data accordingly
+                    // textParent is the button for the unit
+                    Transform textParent = unitClone.transform.GetChild(0);
+                    int textObjects = textParent.childCount;
+                    for (int i = 0; i < textObjects; i++)
+                    {
+                        textParent.GetChild(i).GetComponent<Text>().text = unitInfo[i];
+                    }
+
+                    // Set the correct image for the sprite
+                    changeSprite(textParent.GetChild(0).GetChild(0).GetComponent<Image>(), unit.classType);
+                }
+            }
+            #endregion
         }
         else if (name == "R&D Panel")
         {
+            #region R&D Panel
             if (!rDLoaded)
             {
                 //Iterate through each panel under Skill Panels
@@ -228,7 +297,8 @@ public class MenuManager : MonoBehaviour {
                 }
 
                 rDLoaded = true;
-            }          
+            }
+            #endregion
         }
     }
 }
