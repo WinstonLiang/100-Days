@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 
 public class RDManager : MonoBehaviour 
 {
     public List<SkillTree> skillTrees;
-    public Image locked;
 
     private List<UnitClass> allPlayerUnits;    
 
@@ -23,11 +23,12 @@ public class RDManager : MonoBehaviour
         SkillTree assaultSkill = new SkillTree();
         SkillTree defenderSkill = new SkillTree();
         SkillTree medicSkill = new SkillTree();
-
+       
         skillTrees = new List<SkillTree>();
         skillTrees.Add(assaultSkill);
         skillTrees.Add(defenderSkill);
         skillTrees.Add(medicSkill);
+        SetPassiveInfo();
     }
 
     //Iterate through allPlayerUnits and set the highest levels
@@ -58,12 +59,65 @@ public class RDManager : MonoBehaviour
             panel.GetChild(panel.childCount - 1).gameObject.SetActive(false);
         }
     }
+
+    public void DisplayPassiveInfo(BaseEventData bData)
+    {
+        PointerEventData pData = bData as PointerEventData;
+        string panelName = pData.pointerEnter.transform.parent.parent.name;
+        Transform PassiveInfoTransform = pData.pointerEnter.transform.parent.GetChild(2);
+
+        PassiveInfoTransform.gameObject.SetActive(true);
+        PassiveInfoTransform.GetChild(1).GetComponent<Text>().text = GetSkillTreeByPanelName(panelName).passiveInfo;
+    }
+
+    public void HidePassiveInfo(BaseEventData bData)
+    {
+        PointerEventData pData = bData as PointerEventData;
+        string panelName = pData.pointerEnter.transform.parent.parent.name;
+        pData.pointerEnter.transform.parent.GetChild(2).gameObject.SetActive(false);  
+    }
+
+    /// <summary>
+    /// Sets all the passive information for the classes.
+    /// </summary>
+    void SetPassiveInfo()
+    {
+        //Assault passive info
+        skillTrees[0].passiveInfo = "";
+        //Defender passive info
+        skillTrees[1].passiveInfo = "";
+        //Medic passive info
+        skillTrees[2].passiveInfo = "";
+    }
+
+    /// <summary>
+    /// Returns the SkillTree in skillTrees by the panel name.
+    /// </summary>
+    /// <param name="panelName"></param>
+    /// <returns></returns>
+    SkillTree GetSkillTreeByPanelName(string panelName)
+    {
+        if (panelName == "Assault Panel")
+        {
+            return skillTrees[0];
+        }
+        else if (panelName == "Defender Panel")
+        {
+            return skillTrees[1];
+        }
+        else //if (panelName == "Medic Panel")
+        {
+            return skillTrees[2];
+        }
+    }
 }
 
 public class SkillTree
 {
     public int currentMaxLevel;
     public bool ability1Lock, ability2Lock, ability3Lock;
+    public string passiveInfo;
+
     private int ability1Unlock = 2, 
                 ability2Unlock = 10, 
                 ability3Unlock = 20;
