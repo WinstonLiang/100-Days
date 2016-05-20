@@ -70,7 +70,6 @@ public class MapGenerator : MonoBehaviour {
      public void begin()
      {
           generatedMap = new Dictionary<Vector3, tile>();
-          Debug.Log(";3;");
      }
 
      public void instantiateTiles()
@@ -84,9 +83,9 @@ public class MapGenerator : MonoBehaviour {
               GameObject newTile;
 
                if (T.Value.battle)
-                    newTile = (GameObject)Instantiate(maptile2, T.Value.tilePosition, Quaternion.identity);
+                    newTile = (GameObject)Instantiate(maptile2, T.Value.tilePosition, Quaternion.identity); // Battle tile
                else
-                    newTile = (GameObject)Instantiate(maptile, T.Value.tilePosition, Quaternion.identity);
+                    newTile = (GameObject)Instantiate(maptile, T.Value.tilePosition, Quaternion.identity); // Empty tile
 
               //set the instantiated tile's parent to nodeParent
                newTile.transform.SetParent(nodeParent);

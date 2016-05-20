@@ -16,7 +16,7 @@ public class UnitManager : MonoBehaviour
     public int enemyXCoord = 0;
     public int enemyYCoord = 0;
 
-    MapGenerator mapGenerator;
+    //MapGenerator mapGenerator;
 
     NameSelector nameSelector;
     int maxX, maxY;   // Size of the map
@@ -34,7 +34,7 @@ public class UnitManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
 
             nameSelector = GetComponent<NameSelector>();
-            mapGenerator = GetComponent<MapGenerator>();
+            //mapGenerator = GetComponent<MapGenerator>();
 
             // Get map size from the map Script and resize the array
             //temporarily set to 2, 2
@@ -47,7 +47,7 @@ public class UnitManager : MonoBehaviour
         else
             DestroyImmediate(gameObject);
     }
-
+    
     // Generate and adds all enemies
     void generateAllEnemies()
     {
@@ -58,11 +58,13 @@ public class UnitManager : MonoBehaviour
                 // 25% chance of spawning enemy on tile
                  if (Random.Range(0.0f, 1.0f) < 0.25f)
                  {
-                      generateRandomEnemies(i, j);
-                      mapGenerator.addTile(i, j, true);
+                      //generateRandomEnemies(i, j);
+                      //mapGenerator.addTile(i, j, true);
                  }
                  else
-                      mapGenerator.addTile(i, j, false);
+                 {
+                     //mapGenerator.addTile(i, j, false);
+                 }                      
             }
         }
     }
@@ -114,7 +116,7 @@ public class UnitManager : MonoBehaviour
     // Load the game data and game state, if it fails return to start menu with en error
     void initGameData()
     {
-         mapGenerator.begin();
+         //mapGenerator.begin();
         if (StartMenu.startNew)
         {
             // Initialize the 2D array 
@@ -132,7 +134,7 @@ public class UnitManager : MonoBehaviour
             }
 
             generateAllEnemies();
-            mapGenerator.instantiateTiles();
+            //mapGenerator.instantiateTiles();
         }
         else
             GameStateManager.loadGameData();        
