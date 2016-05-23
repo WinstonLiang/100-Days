@@ -6,17 +6,15 @@ using UnityEngine.SceneManagement;
 public class UnitManager : MonoBehaviour
 {     
     public List<UnitClass> allPlayerUnits = new List<UnitClass>(4);
-    public List<UnitClass>[][] allEnemyUnits;
+    public List<List<UnitClass>> allEnemyUnits;
     public int initialPlayerUnitCount = 3;
     public int maxPlayers = 4;    // Total number of units of a side that participates in a battle at the same time
     public static bool DEBUG = false;
 
     // To be used by Battle script 
     public int battlingSquad = 0;   // 0 is the active battling squad - 1 are the reserves
-    public int enemyXCoord = 0;
-    public int enemyYCoord = 0;
 
-    //MapGenerator mapGenerator;
+    private TileManager tileManager;
 
     NameSelector nameSelector;
     int maxX, maxY;   // Size of the map
@@ -34,12 +32,7 @@ public class UnitManager : MonoBehaviour
             DontDestroyOnLoad(gameObject);
 
             nameSelector = GetComponent<NameSelector>();
-            //mapGenerator = GetComponent<MapGenerator>();
-
-            // Get map size from the map Script and resize the array
-            //temporarily set to 2, 2
-            maxX = 30;               //********************************************************** CHANGE ME LATER *************  
-            maxY = 30;               //********************************************************** CHANGE ME LATER ************* 
+            tileManager = GetComponent<TileManager>();
 
             initGameData();   // Create or load data depending on option clicked
         }
@@ -51,40 +44,37 @@ public class UnitManager : MonoBehaviour
     // Generate and adds all enemies
     void generateAllEnemies()
     {
-        for (int i = 0; i < maxX; i++)
+        int enemyIndex = 0;
+        foreach (Vector2 tile in tileManager.MapTiles.Keys)
         {
-            for (int j = 0; j < maxY; j++)
+            Tile currentTile = tileManager.MapTiles[tile].GetComponent<Tile>();
+
+            // if the tile has an enemy, create an enemy squad of the appropriate rank
+            if (currentTile._hasEnemy)
             {
-                // 25% chance of spawning enemy on tile
-                 if (Random.Range(0.0f, 1.0f) < 0.25f)
-                 {
-                      //generateRandomEnemies(i, j);
-                      //mapGenerator.addTile(i, j, true);
-                 }
-                 else
-                 {
-                     //mapGenerator.addTile(i, j, false);
-                 }                      
+                generateRandomEnemies(enemyIndex, currentTile._coords, currentTile._rank);
+                currentTile._enemyIndex = enemyIndex;
+                enemyIndex++;
             }
         }
     }
 
     // Generate random squad based on hex coordinates
-    void generateRandomEnemies(int x, int y)
+    void generateRandomEnemies(int index, Vector2 coords, int rank)
     {
-        // Calculate the number unit for this squad based on coordinates
-        //temporarily set to 4
-        int squadSize = 4;       //********************************************************** CHANGE ME LATER *************                                    
-        allEnemyUnits[x][y] = new List<UnitClass>(squadSize);
+        // Calculate the number unit for this squad based on rank
+        int squadSize = 4;       //********************************************************** CHANGE ME LATER IF NEEDED*************                                    
+        allEnemyUnits.Add(new List<UnitClass>());
+        allEnemyUnits[index] = new List<UnitClass>(squadSize);
 
         for (int i = 0; i < squadSize; i++)
         {
-            addNewUnit(false, i, 0, x, y);            
+            addNewUnit(false, Random.Range(0, 4), 0, (int)coords.x, (int)coords.y, index);            
         }
     }
 
     // Adds a unit when called (e.g. start new game, recruit a new member)
-    void addNewUnit(bool player, int classType, int battleSquad=1, int x=0, int y=0)
+    void addNewUnit(bool player, int classType, int battleSquad=1, int x=0, int y=0, int enemyIndex=0)
     {
         UnitClass newUnit = new UnitClass();
         nameSelector.getName();
@@ -100,9 +90,8 @@ public class UnitManager : MonoBehaviour
         else
         {
             setEnemyStats(ref newUnit, x, y);
-            allEnemyUnits[x][y].Add(newUnit);
+            allEnemyUnits[enemyIndex].Add(newUnit);
             print("Added Enemy!");
-            //print("Added Enemy: " + newUnit.firstName + " " + newUnit.lastName);
         }
     }
 
@@ -127,14 +116,9 @@ public class UnitManager : MonoBehaviour
                 addNewUnit(true, add, 0);
             }
 
-            allEnemyUnits = new List<UnitClass>[maxX][];
-            for (int i = 0; i < maxX; i++)
-            {
-                allEnemyUnits[i] = new List<UnitClass>[maxY];
-            }
+            allEnemyUnits = new List<List<UnitClass>>();
 
             generateAllEnemies();
-            //mapGenerator.instantiateTiles();
         }
         else
             GameStateManager.loadGameData();        
@@ -164,7 +148,10 @@ public class UnitManager : MonoBehaviour
         return getBattlingSquad().Count;
     }
 
-    ///Return the reserves
+    /// <summary>
+    /// Return the reserve units.
+    /// </summary>
+    /// <returns></returns>
     public List<UnitClass> getReserves()
     {
         List<UnitClass> unitsInReserve = new List<UnitClass>();
@@ -179,19 +166,18 @@ public class UnitManager : MonoBehaviour
         return unitsInReserve;
     }
 
-    // Return the proper enemy set based on map coordinates - temporarily set
-    public List<UnitClass> getEnemySquad()
+    /// <summary>
+    /// Return the proper enemy set based on index of enemyList.
+    /// </summary>
+    /// <param name="enemyIndex"></param>
+    /// <returns></returns>
+    public List<UnitClass> getEnemySquad(int enemyIndex)
     {
         List<UnitClass> unitsInBattle = new List<UnitClass>(maxPlayers);
 
-        if (allEnemyUnits[enemyXCoord][enemyYCoord] == null)//********************************************************** FIX ME LATER ************* 
-            print("No enemies here!");
-        else
+        foreach (UnitClass unit in allEnemyUnits[enemyIndex])
         {
-            foreach (UnitClass unit in allEnemyUnits[enemyXCoord][enemyYCoord])
-            {
-                unitsInBattle.Add(unit);
-            }
+            unitsInBattle.Add(unit);
         }
 
         return unitsInBattle;

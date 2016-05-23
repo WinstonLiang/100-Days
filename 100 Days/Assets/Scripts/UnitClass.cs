@@ -4,6 +4,7 @@ using System.Collections;
 [System.Serializable]
 public class UnitClass
 {
+    public int x, y;
     public string firstName, lastName;
     public int level;
     public int currentHealth, maxHealth;

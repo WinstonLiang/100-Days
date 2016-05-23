@@ -9,18 +9,20 @@ public class TileManager : MonoBehaviour
     public float EncounterChance = 0.25f;
     public GameObject EmptyTile;
     public GameObject EnemyTile;
+    public GameObject ImpassableTile;
+    public Dictionary<Vector2, GameObject> MapTiles;
 
-    private Dictionary<Vector2, GameObject> MapTiles;
-    private Vector2 CurrentTile;
+    private Vector2 CurrentTile, PreviousTile;
     private Transform nodeParent;
     private int CurrentRank = 1;
-    public int InitialTiles = 3;
+    private int InitialTiles = 3;
 
     void Start()
     {
         // Initialize MapTiles
         MapTiles = new Dictionary<Vector2, GameObject>();
         Init();
+        FillEmptyHoles();
     }
 
     /// <summary>
@@ -69,12 +71,21 @@ public class TileManager : MonoBehaviour
                     randomCoords = surroundTiles[randomTile];
                     if (GetConnections(CurrentTile + randomCoords) >= 2 && GetConnections(CurrentTile + randomCoords) < 6)
                     {
+                        PreviousTile = CurrentTile;
                         CurrentTile += randomCoords;
                         MakeRandomTile(CurrentTile, CurrentRank);                                                
                         tileFound = true;
                     }
                     else
                         surroundTiles.RemoveAt(randomTile);
+
+                    // if the current tile is surrounded from all directions,
+                    // go back to the previous tile and find a different path
+                    if (surroundTiles.Count == 0)
+                    {
+                        CurrentTile = PreviousTile;
+                        surroundTiles = FillWithSurroundingTiles(CurrentTile);
+                    }
 
                     if (tileFound) break;
                 }
@@ -86,11 +97,41 @@ public class TileManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Scan the entire map and fill empty holes with an impassable tile.
+    /// </summary>
+    void FillEmptyHoles()
+    {
+        List<Vector2> impassableTiles = new List<Vector2>();
+        List<Vector2> surroundingTiles;
+        foreach (Vector2 coords in MapTiles.Keys)
+        {
+            surroundingTiles = FillWithSurroundingTiles(coords);
+            foreach (Vector2 tile in surroundingTiles)
+            {
+                if (!MapTiles.ContainsKey(coords + tile) && !VectorInList(coords + tile, impassableTiles)
+                    && GetConnections(coords + tile, false) == 6)
+                {
+                    impassableTiles.Add(coords + tile);                    
+                }
+            }
+
+        }
+
+        // create impassable terrain into original tile dictionary
+        foreach (Vector2 coords in impassableTiles)
+        {
+            MakeRandomTile(coords, 0, false);
+        }
+    }
+
+    #region Utility
+    /// <summary>
     /// Returns the number of tiles touching the tile at (x, y).
     /// </summary>
     /// <param name="tile"></param>
+    /// <param name="impassable"></param>
     /// <returns></returns>
-    int GetConnections(Vector2 tile)
+    int GetConnections(Vector2 tile, bool passable=true)
     {
         // if tile being checked is already occupied, skip this tile
         if (MapTiles.ContainsKey(tile))
@@ -107,7 +148,7 @@ public class TileManager : MonoBehaviour
             if (MapTiles.ContainsKey(checkTile))
             {
                 // if the tile is next to a tile with a rank difference of more than 1, return 0                
-                if (!RankInRange(CurrentRank, checkTile))
+                if (passable && !RankInRange(CurrentRank, checkTile))
                     return 0;
 
                 tilesTouching++;
@@ -154,19 +195,43 @@ public class TileManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Manually for loop implementation of searching for an item in a list.
+    /// </summary>
+    /// <param name="coord"></param>
+    /// <param name="TileList"></param>
+    /// <returns></returns>
+    bool VectorInList(Vector2 coord, List<Vector2> TileList)
+    {
+        foreach (Vector2 tile in TileList)
+        {
+            if (tile == coord)
+                return true;
+        }
+        return false;
+    }
+    #endregion
+
     #region Make Tiles
     /// <summary>
     /// Creates an empty or enemy tiles depending on encounter chance.
     /// </summary>
     /// <param name="tile"></param>
-    void MakeRandomTile(Vector2 tile, int rank)
+    /// <param name="rank"></param>
+    /// <param name="passable"></param>
+    void MakeRandomTile(Vector2 tile, int rank, bool passable=true)
     {
-        if (Random.Range(0.0f, 1.0f) <= EncounterChance)
-            MapTiles[tile] = MakeEnemyTile(tile, rank);
+        if (passable)
+        {
+            if (Random.Range(0.0f, 1.0f) <= EncounterChance)
+                MapTiles[tile] = MakeEnemyTile(tile, rank);
+            else
+                MapTiles[tile] = MakeEmptyTile(tile, rank);
+        }
         else
-            MapTiles[tile] = MakeEmptyTile(tile, rank);
+            MapTiles[tile] = MakeImpassableTile(tile, rank);
 
-        print("Making Tile: " + tile.ToString());
+        //print("Making Tile: " + tile.ToString());
     }
 
     /// <summary>
@@ -206,6 +271,26 @@ public class TileManager : MonoBehaviour
         tileClone.transform.SetParent(nodeParent);
 
         if (UnitManager.DEBUG) print("Creating enemy tile!");
+        return tileClone;
+    }
+
+    /// <summary>
+    /// Creates an impassable tile and initializes, then returns the GameObject.
+    /// </summary>
+    /// <param name="tile"></param>
+    /// <param name="rank"></param>
+    /// <returns></returns>
+    GameObject MakeImpassableTile(Vector2 tile, int rank)
+    {
+        GameObject tileClone = (GameObject)Instantiate(ImpassableTile, new Vector3(
+            tile.x * 1.05f,
+            (tile.y + Mathf.Abs(tile.x % 2) * .5f) * 1.12f,
+            0),
+            Quaternion.identity);
+        tileClone.GetComponent<Tile>().initialize(tile, rank, false);
+        tileClone.transform.SetParent(nodeParent);
+
+        if (UnitManager.DEBUG) print("Creating impassable tile!");
         return tileClone;
     }
     #endregion

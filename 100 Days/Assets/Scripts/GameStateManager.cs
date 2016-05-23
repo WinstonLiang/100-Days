@@ -12,7 +12,7 @@ public class GameStateManager : MonoBehaviour
     public class AllUnits
     {
         public List<UnitClass> allPlayerUnits;
-        public List<UnitClass>[][] allEnemyUnits;
+        public List<List<UnitClass>> allEnemyUnits;
     }
 
     public void saveGameData()

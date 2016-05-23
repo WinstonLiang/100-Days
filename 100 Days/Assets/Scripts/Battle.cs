@@ -40,7 +40,7 @@ public class Battle : MonoBehaviour {
         battleUI = GetComponent<BattleUI>();
 
         playerUnits = unitManager.getBattlingSquad();
-        enemyUnits = unitManager.getEnemySquad(); 
+        enemyUnits = unitManager.getEnemySquad(0); ////////////////////////  CHANGE MEEEEEEEEEEEEEEEEEEEEEEEE
     }
 
 	// Update is called once per frame

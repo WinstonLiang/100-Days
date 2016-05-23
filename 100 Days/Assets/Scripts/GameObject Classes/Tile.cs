@@ -6,6 +6,8 @@ public class Tile : MonoBehaviour
     public Vector2 _coords;
     public int _rank;
     public bool _hasEnemy;
+    public int _enemyIndex;
+    public string _terrain;
 
     public void initialize(Vector2 coords, int rank, bool hasEnemy)
     {
