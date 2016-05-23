@@ -13,4 +13,9 @@ public class Tile : MonoBehaviour
         _rank = rank;
         _hasEnemy = hasEnemy;
     }
+
+    public void PrintCoords()
+    {
+        print("Rank: " + _rank + ", " + _coords.ToString());
+    }
 }

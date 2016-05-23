@@ -14,7 +14,7 @@ public class TileManager : MonoBehaviour
     private Vector2 CurrentTile;
     private Transform nodeParent;
     private int CurrentRank = 1;
-    private int InitialTiles = 2;
+    public int InitialTiles = 3;
 
     void Start()
     {
@@ -40,6 +40,11 @@ public class TileManager : MonoBehaviour
         CurrentTile = new Vector2(1, 0);
         MakeRandomTile(CurrentTile, CurrentRank);
 
+        // Set as starting center for tile generation
+        // and insert the second tile to start algorithm
+        CurrentTile = new Vector2(0, 1);
+        MakeRandomTile(CurrentTile, CurrentRank);
+
         bool tileFound = false;
         int randomTile = 0;
         Vector2 randomCoords;
@@ -62,7 +67,7 @@ public class TileManager : MonoBehaviour
                 {
                     randomTile = Random.Range(0, surroundTiles.Count);
                     randomCoords = surroundTiles[randomTile];
-                    if (GetConnections(CurrentTile + randomCoords) > 1)
+                    if (GetConnections(CurrentTile + randomCoords) >= 2 && GetConnections(CurrentTile + randomCoords) < 6)
                     {
                         CurrentTile += randomCoords;
                         MakeRandomTile(CurrentTile, CurrentRank);                                                
@@ -92,15 +97,35 @@ public class TileManager : MonoBehaviour
             return 0;
 
         int tilesTouching = 0;
+        Vector2 checkTile;
         List<Vector2> surroundingTiles = FillWithSurroundingTiles(tile);
 
         foreach (Vector2 surroundTile in surroundingTiles)
         {
-            if (MapTiles.ContainsKey(tile + surroundTile))
+            checkTile = tile + surroundTile;
+
+            if (MapTiles.ContainsKey(checkTile))
+            {
+                // if the tile is next to a tile with a rank difference of more than 1, return 0                
+                if (!RankInRange(CurrentRank, checkTile))
+                    return 0;
+
                 tilesTouching++;
+            }               
         }
 
         return tilesTouching;
+    }
+
+    /// <summary>
+    /// Return whether the two tiles are within 1 rank of each other.
+    /// </summary>
+    /// <param name="rank"></param>
+    /// <param name="checkCoord"></param>
+    /// <returns></returns>
+    bool RankInRange(int rank, Vector2 checkCoord)
+    {
+        return (Mathf.Abs(rank - MapTiles[checkCoord].GetComponent<Tile>()._rank) < 2);
     }
 
     /// <summary>
@@ -113,8 +138,8 @@ public class TileManager : MonoBehaviour
         {
             List<Vector2> surroundingTiles = new List<Vector2>
             {
-                new Vector2(1, 0), new Vector2(0, -1), new Vector2(-1, 0),
-                new Vector2(-1, -1), new Vector2(1, -1), new Vector2(0, 1)
+                new Vector2(1, 0), new Vector2(1, -1), new Vector2(0, 1), 
+                new Vector2(0, -1), new Vector2(-1, 0), new Vector2(-1, -1),  
             };
             return surroundingTiles;
         }
@@ -122,8 +147,8 @@ public class TileManager : MonoBehaviour
         {
             List<Vector2> surroundingTiles = new List<Vector2>
             {
-                new Vector2(1, 0), new Vector2(0, -1), new Vector2(-1, 0),
-                new Vector2(-1, 1), new Vector2(1, 1), new Vector2(0, 1)
+                 new Vector2(1, 1), new Vector2(0, 1), new Vector2(1, 0), 
+                 new Vector2(0, -1), new Vector2(-1, 0), new Vector2(-1, 1), 
             };
             return surroundingTiles;
         }
@@ -140,6 +165,8 @@ public class TileManager : MonoBehaviour
             MapTiles[tile] = MakeEnemyTile(tile, rank);
         else
             MapTiles[tile] = MakeEmptyTile(tile, rank);
+
+        print("Making Tile: " + tile.ToString());
     }
 
     /// <summary>
@@ -150,7 +177,11 @@ public class TileManager : MonoBehaviour
     /// <returns></returns>
     GameObject MakeEmptyTile(Vector2 tile, int rank)
     {
-        GameObject tileClone = (GameObject)Instantiate(EmptyTile, new Vector3(tile.x * 1.05f, (-tile.y + (tile.x % 2) * .5f) * 1.12f, 0), Quaternion.identity);
+        GameObject tileClone = (GameObject)Instantiate(EmptyTile, new Vector3(
+            tile.x * 1.05f, 
+            (tile.y + Mathf.Abs(tile.x % 2) * .5f) * 1.12f,
+            0), 
+            Quaternion.identity);
         tileClone.GetComponent<Tile>().initialize(tile, rank, false);
         tileClone.transform.SetParent(nodeParent);
 
@@ -167,8 +198,9 @@ public class TileManager : MonoBehaviour
     GameObject MakeEnemyTile(Vector2 tile, int rank)
     {
         GameObject tileClone = (GameObject)Instantiate(EnemyTile, new Vector3(
-            tile.x * 1.05f, 
-            (-tile.y + (tile.x % 2) * .5f) * 1.12f, 0), 
+            tile.x * 1.05f,
+            (tile.y + Mathf.Abs(tile.x % 2) * .5f) * 1.12f,
+            0), 
             Quaternion.identity);
         tileClone.GetComponent<Tile>().initialize(tile, rank, true);
         tileClone.transform.SetParent(nodeParent);
