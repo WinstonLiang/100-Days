@@ -1,6 +1,6 @@
 fileFormatVersion: 2
 guid: e9cea80a778de3c4086759597f7ba788
-timeCreated: 1463994353
+timeCreated: 1464084395
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
@@ -8,7 +8,7 @@ MonoImporter:
   - EmptyTile: {fileID: 109052, guid: 577a141ac3156df4b9418e7e3e8a0325, type: 2}
   - EnemyTile: {fileID: 169386, guid: cbc2626e845bca0458787ca34ce063b3, type: 2}
   - ImpassableTile: {fileID: 137324, guid: 64d77b9b17b33e442804d79e567995fc, type: 2}
-  executionOrder: -105
+  executionOrder: 0
   icon: {instanceID: 0}
   userData: 
   assetBundleName: 

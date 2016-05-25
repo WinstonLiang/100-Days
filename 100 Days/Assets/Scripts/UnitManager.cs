@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 [System.Serializable] 
 public class UnitManager : MonoBehaviour
@@ -14,10 +16,11 @@ public class UnitManager : MonoBehaviour
     // To be used by Battle script 
     public int battlingSquad = 0;   // 0 is the active battling squad - 1 are the reserves
 
+    private GameStateManager gameStateManager;
     private TileManager tileManager;
-
-    NameSelector nameSelector;
-    int maxX, maxY;   // Size of the map
+    private NameSelector nameSelector;
+    public GameObject tileInfo;
+    public Vector2 currentUserTile; // CHANGE TO PRIVATE LATER, SET TO PUBLIC FOR TESTING-************************************
 
     // Hold a reference to this object to keep singleton
     static UnitManager unitManagerRef;
@@ -33,6 +36,7 @@ public class UnitManager : MonoBehaviour
 
             nameSelector = GetComponent<NameSelector>();
             tileManager = GetComponent<TileManager>();
+            tileInfo = GameObject.Find("Tile Info");            
 
             initGameData();   // Create or load data depending on option clicked
         }
@@ -40,7 +44,36 @@ public class UnitManager : MonoBehaviour
         else
             DestroyImmediate(gameObject);
     }
-    
+
+    #region Initialize
+    // Load the game data and game state, if it fails return to start menu with en error
+    void initGameData()
+    {
+        //mapGenerator.begin();
+        if (StartMenu.startNew)
+        {
+            // Initialize the 2D array 
+            // For testing, Simulates autopopulating the player units with
+            // starting amount of units when game is started
+            for (int add = 0; add < initialPlayerUnitCount; add++) //********************************************************** CHANGE ME LATER *************    
+            {
+                addNewUnit(true, add, 0);
+            }
+
+            tileManager.Init();
+            currentUserTile = new Vector2(0, 0);
+            allEnemyUnits = new List<List<UnitClass>>();
+            generateAllEnemies();
+        }
+        else
+        {
+            gameStateManager = GameObject.Find("MenuCanvas").GetComponent<GameStateManager>();
+            gameStateManager.loadGameData();
+        }            
+    }
+    #endregion
+
+    #region Unit generation
     // Generate and adds all enemies
     void generateAllEnemies()
     {
@@ -101,29 +134,9 @@ public class UnitManager : MonoBehaviour
         unit.maxHealth += unit.maxHealth*(x+1); // temporary
         unit.currentHealth = unit.maxHealth;
     }
+    #endregion
 
-    // Load the game data and game state, if it fails return to start menu with en error
-    void initGameData()
-    {
-         //mapGenerator.begin();
-        if (StartMenu.startNew)
-        {
-            // Initialize the 2D array 
-            // For testing, Simulates autopopulating the player units with
-            // starting amount of units when game is started
-            for (int add = 0; add < initialPlayerUnitCount; add++) //********************************************************** CHANGE ME LATER *************    
-            {
-                addNewUnit(true, add, 0);
-            }
-
-            allEnemyUnits = new List<List<UnitClass>>();
-
-            generateAllEnemies();
-        }
-        else
-            GameStateManager.loadGameData();        
-    }
-
+    #region Get Squad Functions
     ///Return the squad in battle
     public List<UnitClass> getBattlingSquad()
     {
@@ -182,6 +195,33 @@ public class UnitManager : MonoBehaviour
 
         return unitsInBattle;
     }
+    #endregion
+
+    #region Tile info window
+    public void OpenTileInfo()
+    {
+        GameObject currentTile = EventSystem.current.currentSelectedGameObject;
+        tileInfo.SetActive(true);
+        tileInfo.transform.position = currentTile.transform.position + new Vector3(1, 1, 0);
+        SetTileInfo(currentTile.transform);
+    }
+
+    void SetTileInfo(Transform currentTile)
+    {
+        Tile tile = currentTile.GetComponent<Tile>();
+        string tileStatus = "Unexplored ";
+        // check the status of this tile
+        if (tile._hasEnemy)
+            tileStatus = "Occupied ";
+        else if (tile._cleared)
+            tileStatus = "Controlled ";
+        else if (tile._terrain == Terrain.Mountain)
+            tileStatus = "Impassable ";
+
+        tileInfo.transform.GetChild(0).GetComponent<Text>().text = tileStatus + tile._terrain.ToString();
+        tileInfo.transform.GetChild(1).GetComponent<Text>().text = tile._hasEnemy ? allEnemyUnits[tile._enemyIndex].Count.ToString() : "0";
+    }
+    #endregion
 
     // Temporary function to test battle
     public void TestBattle()  //********************************************************** DELETE ME LATER *************                                    

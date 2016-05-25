@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 public class TileManager : MonoBehaviour
 {
@@ -13,15 +14,29 @@ public class TileManager : MonoBehaviour
     public Dictionary<Vector2, GameObject> MapTiles;
 
     private Vector2 CurrentTile, PreviousTile;
-    private Transform nodeParent;
+    private UnitManager unitManager;
+    public Transform nodeParent;
     private int CurrentRank = 1;
     private int InitialTiles = 3;
 
     void Start()
+    {                       
+        unitManager = GetComponent<UnitManager>();
+    }
+
+    /// <summary>
+    /// Generate new set of tiles.
+    /// </summary>
+    public void Init()
     {
         // Initialize MapTiles
         MapTiles = new Dictionary<Vector2, GameObject>();
-        Init();
+        unitManager = GetComponent<UnitManager>();
+
+        //get nodeParent transform
+        nodeParent = GameObject.Find("DragParent").transform;
+
+        GenerateMap();
         FillEmptyHoles();
     }
 
@@ -29,13 +44,11 @@ public class TileManager : MonoBehaviour
     /// Fills MapTiles with TilesPerZone x NumOfZones tiles.
     /// The tiles must be touching at least 2 other tiles to be created.
     /// </summary>
-    void Init()
-    {
-        //get nodeParent transform
-        nodeParent = GameObject.Find("DragParent").transform;
-
+    void GenerateMap()
+    {       
         // Insert starting node (0, 0)
-        MapTiles[new Vector2(0, 0)] = MakeEmptyTile(new Vector2(0, 0), 0);
+        MapTiles[new Vector2(0, 0)] = MakeEmptyTile(new Vector2(0, 0), 0, nodeParent);
+        MapTiles[new Vector2(0, 0)].GetComponent<Tile>()._cleared = true;
 
         // Set as starting center for tile generation       
         // and insert the first new tile to start the algorithm         
@@ -89,9 +102,7 @@ public class TileManager : MonoBehaviour
 
                     if (tileFound) break;
                 }
-
             }
-
             CurrentRank++;
         }
     }
@@ -108,13 +119,12 @@ public class TileManager : MonoBehaviour
             surroundingTiles = FillWithSurroundingTiles(coords);
             foreach (Vector2 tile in surroundingTiles)
             {
-                if (!MapTiles.ContainsKey(coords + tile) && !VectorInList(coords + tile, impassableTiles)
-                    && GetConnections(coords + tile, false) == 6)
+                if (!MapTiles.ContainsKey(coords + tile) && !VectorInList(coords + tile, impassableTiles))
+                    //&& GetConnections(coords + tile, false) >= 5)
                 {
                     impassableTiles.Add(coords + tile);                    
                 }
             }
-
         }
 
         // create impassable terrain into original tile dictionary
@@ -224,14 +234,12 @@ public class TileManager : MonoBehaviour
         if (passable)
         {
             if (Random.Range(0.0f, 1.0f) <= EncounterChance)
-                MapTiles[tile] = MakeEnemyTile(tile, rank);
+                MapTiles[tile] = MakeEnemyTile(tile, rank, nodeParent);
             else
-                MapTiles[tile] = MakeEmptyTile(tile, rank);
+                MapTiles[tile] = MakeEmptyTile(tile, rank, nodeParent);
         }
         else
-            MapTiles[tile] = MakeImpassableTile(tile, rank);
-
-        //print("Making Tile: " + tile.ToString());
+            MapTiles[tile] = MakeImpassableTile(tile, rank, nodeParent);
     }
 
     /// <summary>
@@ -239,16 +247,22 @@ public class TileManager : MonoBehaviour
     /// </summary>
     /// <param name="tile"></param>
     /// <param name="rank"></param>
+    /// <param name="tileScript"></param>
     /// <returns></returns>
-    GameObject MakeEmptyTile(Vector2 tile, int rank)
+    public GameObject MakeEmptyTile(Vector2 tile, int rank, Transform parent, int enemyIndex=-1, bool cleared=false)
     {
         GameObject tileClone = (GameObject)Instantiate(EmptyTile, new Vector3(
             tile.x * 1.05f, 
             (tile.y + Mathf.Abs(tile.x % 2) * .5f) * 1.12f,
             0), 
             Quaternion.identity);
+        tileClone.transform.SetParent(parent);
+        tileClone.GetComponent<Button>().onClick.AddListener(() => { unitManager.OpenTileInfo(); }); //-------------NOT BEING ASSIGNED WHEN CREATED BY LOADING 
+
+        // if tileScript is passed in, set the saved data      
         tileClone.GetComponent<Tile>().initialize(tile, rank, false);
-        tileClone.transform.SetParent(nodeParent);
+        if (enemyIndex != -1)
+            tileClone.GetComponent<Tile>().ReplaceAttributes(enemyIndex, cleared);
 
         if (UnitManager.DEBUG) print("Creating empty tile!");
         return tileClone;
@@ -259,16 +273,22 @@ public class TileManager : MonoBehaviour
     /// </summary>
     /// <param name="tile"></param>
     /// <param name="rank"></param>
+    /// <param name="tileScript"></param>
     /// <returns></returns>
-    GameObject MakeEnemyTile(Vector2 tile, int rank)
+    public GameObject MakeEnemyTile(Vector2 tile, int rank, Transform parent, int enemyIndex=-1, bool cleared=false)
     {
         GameObject tileClone = (GameObject)Instantiate(EnemyTile, new Vector3(
             tile.x * 1.05f,
             (tile.y + Mathf.Abs(tile.x % 2) * .5f) * 1.12f,
             0), 
             Quaternion.identity);
+        tileClone.transform.SetParent(parent);
+        tileClone.GetComponent<Button>().onClick.AddListener(() => { unitManager.OpenTileInfo(); });
+
+        // if tileScript is passed in, set the saved data      
         tileClone.GetComponent<Tile>().initialize(tile, rank, true);
-        tileClone.transform.SetParent(nodeParent);
+        if (enemyIndex != -1)
+            tileClone.GetComponent<Tile>().ReplaceAttributes(enemyIndex, cleared);
 
         if (UnitManager.DEBUG) print("Creating enemy tile!");
         return tileClone;
@@ -279,16 +299,22 @@ public class TileManager : MonoBehaviour
     /// </summary>
     /// <param name="tile"></param>
     /// <param name="rank"></param>
+    /// <param name="tileScript"></param>
     /// <returns></returns>
-    GameObject MakeImpassableTile(Vector2 tile, int rank)
+    public GameObject MakeImpassableTile(Vector2 tile, int rank, Transform parent, int enemyIndex=-1, bool cleared=false)
     {
         GameObject tileClone = (GameObject)Instantiate(ImpassableTile, new Vector3(
             tile.x * 1.05f,
             (tile.y + Mathf.Abs(tile.x % 2) * .5f) * 1.12f,
             0),
             Quaternion.identity);
-        tileClone.GetComponent<Tile>().initialize(tile, rank, false);
-        tileClone.transform.SetParent(nodeParent);
+        tileClone.transform.SetParent(parent);
+        tileClone.GetComponent<Button>().onClick.AddListener(() => { unitManager.OpenTileInfo(); });
+
+        // if tileScript is passed in, set the saved data      
+        tileClone.GetComponent<Tile>().initialize(tile, rank, false, Terrain.Mountain);
+        if (enemyIndex != -1)
+            tileClone.GetComponent<Tile>().ReplaceAttributes(enemyIndex, cleared);
 
         if (UnitManager.DEBUG) print("Creating impassable tile!");
         return tileClone;

@@ -3,21 +3,22 @@ using UnityEngine.EventSystems;
 using System.Collections;
 
 public class CameraMapScript : MonoBehaviour {
-	
-	// Update is called once per frame
 
      public int triggerMove;
-     public float moveIncrement;
-     public int min_x;
-     public int max_x;
-     public int min_y;
-     public int max_y;
-     private float mousePosX;
-     private float mousePosY;
-
+     public float moveIncrement, mousePosX, mousePosY;
+     public int min_x, min_y, max_x, max_y;
      public float dragFactor = 1.0f;
 
-	void Update () {
+     public  GameObject tileInfo;
+
+    void Start()
+     {
+         tileInfo = GameObject.Find("Tile Info");
+         tileInfo.SetActive(false);
+     }
+
+	void Update () 
+    {
           mousePosX = Input.mousePosition.x;
           mousePosY = Input.mousePosition.y;
           if (mousePosX < triggerMove && transform.position.x > min_x)
@@ -36,7 +37,12 @@ public class CameraMapScript : MonoBehaviour {
 
         if (pointerData.button.ToString() == "Right")
         {
-            transform.position = transform.position + new Vector3(pointerData.delta.x * dragFactor * 0.01f, pointerData.delta.y * dragFactor * 0.01f, 0);
+            transform.position += new Vector3(pointerData.delta.x * dragFactor * 0.01f, pointerData.delta.y * dragFactor * 0.01f, 0);
+
+            if (tileInfo.activeSelf)
+            {
+                tileInfo.transform.position += new Vector3(pointerData.delta.x * dragFactor * 0.01f, pointerData.delta.y * dragFactor * 0.01f, 0);
+            }
         }
     }
 }
